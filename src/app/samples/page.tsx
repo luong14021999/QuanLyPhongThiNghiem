@@ -1,0 +1,257 @@
+import {
+  Plus,
+  Filter,
+  Download,
+  Printer,
+  QrCode,
+  Search,
+  User,
+} from "lucide-react";
+import { Header } from "@/components/layout/header";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { samples, type SampleStatus } from "@/lib/mock-data";
+
+const statusVariant: Record<
+  SampleStatus,
+  "secondary" | "default" | "warning" | "success" | "outline"
+> = {
+  "Đã tiếp nhận": "secondary",
+  "Đang phân tích": "default",
+  "Chờ duyệt": "warning",
+  "Hoàn thành": "success",
+  "Đã trả KQ": "outline",
+};
+
+const statusCounts = samples.reduce<Record<string, number>>((acc, s) => {
+  acc[s.status] = (acc[s.status] || 0) + 1;
+  return acc;
+}, {});
+
+export default function SamplesPage() {
+  return (
+    <>
+      <Header
+        title="Quản lý tiếp nhận mẫu"
+        description="Yêu cầu phân tích, mã hóa mẫu tự động, theo dõi trạng thái và in phiếu nhận mẫu"
+      />
+      <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 scrollbar-thin">
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Phiếu tiếp nhận mẫu mới</CardTitle>
+              <CardDescription>
+                Mã mẫu được sinh tự động theo định dạng{" "}
+                <span className="font-mono text-foreground">
+                  M-YYYY-NNNNN
+                </span>
+                ; có thể in phiếu kèm mã QR sau khi lưu.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="code">Mã mẫu</Label>
+                  <Input
+                    id="code"
+                    readOnly
+                    defaultValue="M-2026-00322"
+                    className="font-mono"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="received">Ngày tiếp nhận</Label>
+                  <Input id="received" type="date" defaultValue="2026-05-20" />
+                </div>
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label htmlFor="customer">Khách hàng</Label>
+                  <Input
+                    id="customer"
+                    placeholder="Tên tổ chức / cá nhân yêu cầu phân tích"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="type">Loại mẫu</Label>
+                  <Input
+                    id="type"
+                    placeholder="VD: Nước thải, Đất, Phân bón, Thực phẩm..."
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="origin">Nguồn gốc / vị trí</Label>
+                  <Input id="origin" placeholder="Khu vực lấy mẫu" />
+                </div>
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label htmlFor="criteria">Chỉ tiêu phân tích</Label>
+                  <Input
+                    id="criteria"
+                    placeholder="Nhập danh sách chỉ tiêu, phân tách bằng dấu phẩy"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="due">Hạn trả kết quả</Label>
+                  <Input id="due" type="date" defaultValue="2026-05-27" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="tech">Phụ trách</Label>
+                  <Input id="tech" placeholder="Kỹ thuật viên" />
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-2 mt-6 pt-4 border-t">
+                <Button variant="outline">
+                  <Printer />
+                  In phiếu nhận mẫu
+                </Button>
+                <Button>
+                  <Plus />
+                  Lưu & tạo mẫu
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Tóm tắt trạng thái</CardTitle>
+              <CardDescription>
+                Phân bổ mẫu hiện tại theo trạng thái xử lý
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {Object.entries(statusCounts).map(([status, count]) => (
+                <div
+                  key={status}
+                  className="flex items-center justify-between text-sm"
+                >
+                  <div className="flex items-center gap-2">
+                    <Badge variant={statusVariant[status as SampleStatus]}>
+                      {status}
+                    </Badge>
+                  </div>
+                  <span className="font-medium">{count}</span>
+                </div>
+              ))}
+              <div className="pt-3 border-t">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <QrCode className="w-4 h-4" />
+                  Tự sinh QR cho từng mẫu giúp tra cứu nhanh.
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <Card>
+          <CardHeader className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between space-y-0">
+            <div>
+              <CardTitle>Danh sách mẫu</CardTitle>
+              <CardDescription>
+                Tổng {samples.length} mẫu · cập nhật lần cuối hôm nay
+              </CardDescription>
+            </div>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <div className="flex items-center gap-2 rounded-md border border-input bg-background px-2.5 h-9 text-sm w-full sm:w-72">
+                <Search className="w-4 h-4 text-muted-foreground" />
+                <input
+                  className="bg-transparent outline-none flex-1"
+                  placeholder="Tìm mã, khách hàng..."
+                />
+              </div>
+              <Button variant="outline" size="sm">
+                <Filter />
+                Lọc
+              </Button>
+              <Button variant="outline" size="sm">
+                <Download />
+                Xuất Excel
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="all">
+              <TabsList>
+                <TabsTrigger value="all">Tất cả</TabsTrigger>
+                <TabsTrigger value="in-progress">Đang phân tích</TabsTrigger>
+                <TabsTrigger value="review">Chờ duyệt</TabsTrigger>
+                <TabsTrigger value="done">Đã trả KQ</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <div className="mt-4 rounded-lg border">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/40">
+                    <TableHead>Mã mẫu</TableHead>
+                    <TableHead>Khách hàng</TableHead>
+                    <TableHead>Loại mẫu</TableHead>
+                    <TableHead>Tiếp nhận</TableHead>
+                    <TableHead>Hạn trả</TableHead>
+                    <TableHead>Phụ trách</TableHead>
+                    <TableHead>Tiến độ</TableHead>
+                    <TableHead>Trạng thái</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {samples.map((s) => (
+                    <TableRow key={s.id}>
+                      <TableCell className="font-mono font-medium">
+                        {s.code}
+                      </TableCell>
+                      <TableCell className="max-w-[220px] truncate">
+                        {s.customer}
+                      </TableCell>
+                      <TableCell>{s.type}</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {s.receivedAt}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {s.dueAt}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1.5 text-sm">
+                          <User className="w-3.5 h-3.5 text-muted-foreground" />
+                          {s.technician}
+                        </div>
+                      </TableCell>
+                      <TableCell className="w-[160px]">
+                        <div className="flex items-center gap-2">
+                          <Progress value={s.progress} className="flex-1" />
+                          <span className="text-xs text-muted-foreground w-9 text-right">
+                            {s.progress}%
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={statusVariant[s.status]}>
+                          {s.status}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      </main>
+    </>
+  );
+}
