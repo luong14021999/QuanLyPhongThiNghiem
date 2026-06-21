@@ -7,6 +7,10 @@ import {
   Filter,
   Search,
   ShieldAlert,
+  FileText,
+  FlaskRound,
+  Factory,
+  Snowflake,
 } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
@@ -27,7 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { chemicals } from "@/lib/mock-data";
+import { chemicals, chemicalUsageLogs } from "@/lib/mock-data";
 
 const hazardVariant = {
   Thường: "secondary",
@@ -319,6 +323,143 @@ export default function ChemicalsPage() {
             </CardContent>
           </Card>
         </section>
+
+        <Card>
+          <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between space-y-0">
+            <div>
+              <CardTitle>Hồ sơ hóa chất – chất chuẩn</CardTitle>
+              <CardDescription>
+                Đặc tính kỹ thuật, NSX, điều kiện bảo quản, phép thử sử dụng –
+                phục vụ truy xuất ISO/IEC 17025
+              </CardDescription>
+            </div>
+            <Button variant="outline" size="sm">
+              <FileText />
+              Xuất hồ sơ PDF
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              {chemicals.slice(0, 4).map((c) => (
+                <div
+                  key={c.id}
+                  className="p-4 rounded-lg border bg-card space-y-3"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <FlaskRound className="w-4 h-4 text-primary shrink-0" />
+                        <span className="font-medium text-sm">{c.name}</span>
+                        {c.isReference && (
+                          <Badge variant="default">Chất chuẩn</Badge>
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground font-mono mt-0.5">
+                        {c.code} · CAS {c.cas}
+                      </div>
+                    </div>
+                    <Badge variant={hazardVariant[c.hazard]}>{c.hazard}</Badge>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
+                    <div>
+                      <div className="text-muted-foreground">Đặc tính KT</div>
+                      <div className="font-medium">{c.technicalSpec}</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground flex items-center gap-1">
+                        <Factory className="w-3 h-3" />
+                        Nhà sản xuất
+                      </div>
+                      <div className="font-medium">{c.manufacturer}</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground">Ngày sản xuất</div>
+                      <div className="font-medium">{c.manufactureDate}</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground">Ngày nhận</div>
+                      <div className="font-medium">{c.receivedAt}</div>
+                    </div>
+                    <div className="col-span-2">
+                      <div className="text-muted-foreground flex items-center gap-1">
+                        <Snowflake className="w-3 h-3" />
+                        Điều kiện bảo quản
+                      </div>
+                      <div className="font-medium">{c.storageCondition}</div>
+                    </div>
+                    <div className="col-span-2">
+                      <div className="text-muted-foreground">
+                        Dùng cho phép thử
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 mt-1">
+                        {c.usedFor.map((u) => (
+                          <Badge
+                            key={u}
+                            variant="secondary"
+                            className="text-[11px]"
+                          >
+                            {u}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Nhật ký sử dụng hóa chất – chất chuẩn</CardTitle>
+            <CardDescription>
+              Ghi nhận lượng dùng theo từng mẫu / phép thử – đối chiếu kho và
+              QA/QC
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-lg border">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/40">
+                    <TableHead>Thời điểm</TableHead>
+                    <TableHead>Hóa chất / chất chuẩn</TableHead>
+                    <TableHead>Lượng dùng</TableHead>
+                    <TableHead>Mẫu</TableHead>
+                    <TableHead>Phép thử</TableHead>
+                    <TableHead>KTV</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {chemicalUsageLogs.map((u) => (
+                    <TableRow key={u.id}>
+                      <TableCell className="text-muted-foreground text-xs">
+                        {u.usedAt}
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium text-sm">
+                          {u.chemicalName}
+                        </div>
+                        <div className="text-xs text-muted-foreground font-mono">
+                          {u.chemicalCode}
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {u.qty} {u.unit}
+                      </TableCell>
+                      <TableCell className="font-mono text-xs">
+                        {u.sampleCode}
+                      </TableCell>
+                      <TableCell className="text-xs">{u.method}</TableCell>
+                      <TableCell>{u.technician}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
       </main>
     </>
   );

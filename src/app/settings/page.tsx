@@ -35,7 +35,7 @@ export default function SettingsPage() {
                 <Label htmlFor="lab">Tên phòng thí nghiệm</Label>
                 <Input
                   id="lab"
-                  defaultValue="PTN Phân tích Đất – Nước – Nông sản"
+                  defaultValue="PTN Phân tích Môi trường – Nông nghiệp – ATTP"
                 />
               </div>
               <div className="space-y-1.5">

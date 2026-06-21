@@ -1,5 +1,6 @@
 import { Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MobileSidebar } from "@/components/layout/mobile-sidebar";
 
 type HeaderProps = {
   title: string;
@@ -8,17 +9,18 @@ type HeaderProps = {
 
 export function Header({ title, description }: HeaderProps) {
   return (
-    <header className="h-16 shrink-0 border-b border-border bg-card/60 backdrop-blur supports-[backdrop-filter]:bg-card/60 px-4 sm:px-6 flex items-center justify-between gap-4">
-      <div className="min-w-0">
-        <h1 className="text-base sm:text-lg font-semibold truncate">{title}</h1>
+    <header className="h-14 sm:h-16 shrink-0 border-b border-border bg-card/60 backdrop-blur supports-[backdrop-filter]:bg-card/60 px-3 sm:px-6 flex items-center gap-3 sm:gap-4">
+      <MobileSidebar />
+      <div className="min-w-0 flex-1">
+        <h1 className="text-sm sm:text-lg font-semibold truncate">{title}</h1>
         {description && (
-          <p className="text-xs text-muted-foreground truncate">
+          <p className="hidden sm:block text-xs text-muted-foreground truncate">
             {description}
           </p>
         )}
       </div>
-      <div className="flex items-center gap-2">
-        <div className="hidden md:flex items-center gap-2 rounded-md border border-input bg-background px-2.5 h-9 w-72 text-sm text-muted-foreground">
+      <div className="flex items-center gap-2 shrink-0">
+        <div className="hidden lg:flex items-center gap-2 rounded-md border border-input bg-background px-2.5 h-9 w-72 text-sm text-muted-foreground">
           <Search className="w-4 h-4" />
           <input
             className="bg-transparent outline-none flex-1 placeholder:text-muted-foreground"
@@ -28,6 +30,14 @@ export function Header({ title, description }: HeaderProps) {
             Ctrl K
           </kbd>
         </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Tìm kiếm"
+          className="lg:hidden"
+        >
+          <Search />
+        </Button>
         <Button variant="ghost" size="icon" aria-label="Thông báo">
           <Bell />
         </Button>

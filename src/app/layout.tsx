@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin", "vietnamese"] });
 export const metadata: Metadata = {
   title: "Viện Nông Nghiệp Thanh Hóa – Quản lý PTN",
   description:
-    "Hệ thống quản lý phòng thí nghiệm phân tích Đất – Nước – Nông sản, theo ISO/IEC 17025",
+    "Hệ thống quản lý phòng thí nghiệm phân tích môi trường – đất – nước – phân bón – an toàn thực phẩm, vận hành theo ISO/IEC 17025",
 };
 
 export default function RootLayout({

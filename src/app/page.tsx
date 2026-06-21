@@ -45,11 +45,29 @@ export default function DashboardPage() {
   return (
     <>
       <Header
-        title="Bảng điều khiển"
-        description="Tổng quan hoạt động phòng thí nghiệm – cập nhật theo thời gian thực"
+        title="Bảng điều khiển – Viện Nông Nghiệp Thanh Hóa"
+        description="Số hóa quy trình nhận mẫu · phân tích · thiết bị · hóa chất theo ISO/IEC 17025"
       />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 scrollbar-thin">
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <section className="rounded-xl border bg-primary/5 p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="w-12 h-12 rounded-lg bg-primary/15 text-primary flex items-center justify-center shrink-0">
+            <FlaskConical className="w-6 h-6" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-semibold">
+              PTN Phân tích Môi trường – Nông nghiệp – ATTP
+            </div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              Đáp ứng phân tích đất – nước – phân bón – an toàn thực phẩm, giảm
+              sai sót thủ công, tăng tốc xử lý mẫu và hỗ trợ tự chủ tài chính.
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="secondary">ISO/IEC 17025</Badge>
+            <Badge variant="outline">VILAS 1234</Badge>
+          </div>
+        </section>
+        <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <KpiCard
             label="Mẫu trong tháng"
             value={dashboardKpis.sampleTotal}
