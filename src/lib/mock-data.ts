@@ -2131,6 +2131,913 @@ export const fieldSamples: FieldSample[] = [
   },
 ];
 
+export type TestRequestStatus =
+  | "Yêu cầu mới"
+  | "Đã báo giá"
+  | "KH chấp nhận"
+  | "Đã ký HĐ"
+  | "Đã nhận mẫu"
+  | "Đã hủy";
+
+export type TestRequestCriterion = {
+  name: string;
+  method: string;
+  unitPrice: number;
+};
+
+export type TestRequest = {
+  id: string;
+  code: string;
+  customer: string;
+  customerCode: string;
+  contact: string;
+  phone: string;
+  matrix: string;
+  expectedSamples: number;
+  criteria: TestRequestCriterion[];
+  purpose: string;
+  decisionRule: string;
+  expectedDeliveryDays: number;
+  vatRate: number;
+  notes?: string;
+  status: TestRequestStatus;
+  createdAt: string;
+  quotedAt?: string;
+  acceptedAt?: string;
+  contractCode?: string;
+  linkedSampleCodes?: string[];
+};
+
+export const testRequests: TestRequest[] = [
+  {
+    id: "tr1",
+    code: "YC-VNNTH-2026-00124",
+    customer: "Trang trại Rau an toàn Yên Định",
+    customerCode: "KH-VNNTH-0298",
+    contact: "Bà Phạm Thị Hằng",
+    phone: "0987 654 321",
+    matrix: "Rau cải lá tươi",
+    expectedSamples: 6,
+    criteria: [
+      { name: "Chlorpyrifos", method: "GC-MS QuEChERS", unitPrice: 350000 },
+      { name: "Cypermethrin", method: "GC-MS QuEChERS", unitPrice: 350000 },
+      { name: "Abamectin", method: "LC-MS/MS", unitPrice: 450000 },
+      { name: "Carbendazim", method: "HPLC-UV", unitPrice: 280000 },
+      { name: "Imidacloprid", method: "LC-MS/MS", unitPrice: 450000 },
+      { name: "Pb tổng", method: "ICP-MS", unitPrice: 220000 },
+      { name: "Cd tổng", method: "ICP-MS", unitPrice: 220000 },
+      { name: "Nitrat", method: "HPLC", unitPrice: 200000 },
+    ],
+    purpose:
+      "Phân tích định kỳ trước khi xuất bán cho hệ thống siêu thị – yêu cầu KQ trong 5 ngày làm việc",
+    decisionRule: "Guarded acceptance theo MRL Codex",
+    expectedDeliveryDays: 5,
+    vatRate: 0,
+    status: "Yêu cầu mới",
+    createdAt: "2026-06-25 14:32",
+  },
+  {
+    id: "tr2",
+    code: "YC-VNNTH-2026-00125",
+    customer: "Hộ ông Lê Bá Khánh",
+    customerCode: "KH-VNNTH-0312",
+    contact: "Ông Lê Bá Khánh",
+    phone: "0944 112 233",
+    matrix: "Đất vườn cây ăn quả",
+    expectedSamples: 1,
+    criteria: [
+      { name: "pHKCl", method: "TCVN 5979:2007", unitPrice: 80000 },
+      { name: "OM%", method: "Walkley-Black TCVN 8941:2011", unitPrice: 180000 },
+      { name: "N tổng", method: "Kjeldahl TCVN 6498:1999", unitPrice: 250000 },
+      { name: "P2O5 dễ tiêu", method: "Bray-II", unitPrice: 220000 },
+      { name: "K2O dễ tiêu", method: "Quang kế ngọn lửa", unitPrice: 200000 },
+    ],
+    purpose: "Tư vấn cải tạo đất vườn cam đang vàng lá",
+    decisionRule: "Simple acceptance (báo cáo giá trị + khuyến cáo bón)",
+    expectedDeliveryDays: 7,
+    vatRate: 0,
+    notes: "Đề nghị Viện cử cán bộ tư vấn sau khi có KQ",
+    status: "Yêu cầu mới",
+    createdAt: "2026-06-25 09:10",
+  },
+  {
+    id: "tr3",
+    code: "YC-VNNTH-2026-00123",
+    customer: "Phòng NN&PTNT huyện Thọ Xuân",
+    customerCode: "KH-VNNTH-0156",
+    contact: "Ông Hoàng Minh Đức",
+    phone: "0237 3 833 220",
+    matrix: "Nước tưới kênh nội đồng",
+    expectedSamples: 30,
+    criteria: [
+      { name: "pH", method: "TCVN 6492:2011", unitPrice: 60000 },
+      { name: "EC", method: "Đo điện cực", unitPrice: 60000 },
+      { name: "Coliform", method: "TCVN 6187-1:2009", unitPrice: 250000 },
+      { name: "As", method: "SMEWW 3114B", unitPrice: 320000 },
+      { name: "Pb", method: "SMEWW 3111B", unitPrice: 280000 },
+      { name: "Cd", method: "SMEWW 3111B", unitPrice: 280000 },
+    ],
+    purpose: "Quan trắc định kỳ Q2/2026 kênh Bái Thượng + nhánh",
+    decisionRule: "Đối chiếu QCVN 39:2011/BTNMT (Guarded acceptance)",
+    expectedDeliveryDays: 14,
+    vatRate: 8,
+    status: "Đã báo giá",
+    createdAt: "2026-06-22 10:00",
+    quotedAt: "2026-06-23 16:40",
+  },
+  {
+    id: "tr4",
+    code: "YC-VNNTH-2026-00122",
+    customer: "Công ty CP Phân bón Tiến Nông",
+    customerCode: "KH-VNNTH-0118",
+    contact: "Bà Nguyễn Thị Lan",
+    phone: "0918 226 145",
+    matrix: "Phân bón NPK 16-16-8",
+    expectedSamples: 4,
+    criteria: [
+      { name: "N tổng", method: "Kjeldahl", unitPrice: 250000 },
+      { name: "P2O5 hữu hiệu", method: "TCVN 8559:2010", unitPrice: 280000 },
+      { name: "K2O hữu hiệu", method: "Quang kế ngọn lửa", unitPrice: 220000 },
+      { name: "Độ ẩm", method: "Sấy 105°C", unitPrice: 120000 },
+      { name: "Biuret", method: "Quang phổ UV", unitPrice: 250000 },
+    ],
+    purpose: "Kiểm tra chất lượng lô hàng xuất xưởng Q2/2026",
+    decisionRule: "Guarded acceptance theo NĐ 84/2019/NĐ-CP (dung sai ±0.5%)",
+    expectedDeliveryDays: 7,
+    vatRate: 8,
+    status: "KH chấp nhận",
+    createdAt: "2026-06-20 14:00",
+    quotedAt: "2026-06-21 09:20",
+    acceptedAt: "2026-06-23 11:05",
+  },
+  {
+    id: "tr5",
+    code: "YC-VNNTH-2026-00120",
+    customer: "HTX Cam Vân Du",
+    customerCode: "KH-VNNTH-0211",
+    contact: "Ông Trịnh Văn Sơn",
+    phone: "0905 778 412",
+    matrix: "Quả cam tươi (đầu vụ)",
+    expectedSamples: 8,
+    criteria: [
+      { name: "Dư lượng BVTV (GC-MS multi)", method: "QuEChERS GC-MS", unitPrice: 1200000 },
+      { name: "Pb", method: "ICP-MS", unitPrice: 220000 },
+      { name: "Cd", method: "ICP-MS", unitPrice: 220000 },
+      { name: "Nitrat", method: "HPLC", unitPrice: 200000 },
+    ],
+    purpose: "Chuẩn bị hồ sơ xuất khẩu lô cam Vân Du sang siêu thị Hà Nội",
+    decisionRule: "Guarded acceptance theo Codex MRL (yêu cầu KH xuất khẩu)",
+    expectedDeliveryDays: 5,
+    vatRate: 8,
+    status: "Đã ký HĐ",
+    createdAt: "2026-06-15 10:30",
+    quotedAt: "2026-06-16 14:10",
+    acceptedAt: "2026-06-17 09:00",
+    contractCode: "HĐ-VNNTH-2026-0089",
+  },
+  {
+    id: "tr6",
+    code: "YC-VNNTH-2026-00121",
+    customer: "HTX Nông nghiệp Đông Sơn",
+    customerCode: "KH-VNNTH-0124",
+    contact: "Ông Lê Văn Hợp",
+    phone: "0912 345 678",
+    matrix: "Đất canh tác lúa + Nước tưới ruộng",
+    expectedSamples: 12,
+    criteria: [
+      { name: "pHKCl", method: "TCVN 5979:2007", unitPrice: 80000 },
+      { name: "OM% Walkley-Black", method: "TCVN 8941:2011", unitPrice: 180000 },
+      { name: "N tổng", method: "Kjeldahl", unitPrice: 250000 },
+      { name: "P2O5 dễ tiêu", method: "Bray-II", unitPrice: 220000 },
+      { name: "K2O dễ tiêu", method: "Quang kế ngọn lửa", unitPrice: 200000 },
+      { name: "CEC", method: "Amoni axetat", unitPrice: 280000 },
+      { name: "pH nước tưới", method: "TCVN 6492:2011", unitPrice: 60000 },
+      { name: "EC nước tưới", method: "Đo điện cực", unitPrice: 60000 },
+    ],
+    purpose: "Theo dõi sức khỏe đất sau 3 vụ – chuẩn bị bón phân vụ Hè Thu",
+    decisionRule: "Simple acceptance (báo cáo + khuyến cáo)",
+    expectedDeliveryDays: 10,
+    vatRate: 0,
+    status: "Đã nhận mẫu",
+    createdAt: "2026-06-12 08:00",
+    quotedAt: "2026-06-13 10:15",
+    acceptedAt: "2026-06-14 14:00",
+    contractCode: "HĐ-VNNTH-2026-0085",
+    linkedSampleCodes: ["M-VNNTH-2026-00318", "M-VNNTH-2026-00319"],
+  },
+  {
+    id: "tr7",
+    code: "YC-VNNTH-2026-00118",
+    customer: "Công ty TNHH Mía đường Lam Sơn",
+    customerCode: "KH-VNNTH-0341",
+    contact: "Ông Nguyễn Văn Hùng",
+    phone: "0935 552 100",
+    matrix: "Đất trồng mía",
+    expectedSamples: 8,
+    criteria: [
+      { name: "pHKCl", method: "TCVN 5979:2007", unitPrice: 80000 },
+      { name: "OM%", method: "Walkley-Black", unitPrice: 180000 },
+      { name: "N tổng", method: "Kjeldahl", unitPrice: 250000 },
+      { name: "P2O5 dễ tiêu", method: "Bray-II", unitPrice: 220000 },
+      { name: "K2O dễ tiêu", method: "Quang kế ngọn lửa", unitPrice: 200000 },
+    ],
+    purpose: "Khảo sát đất trước khi đầu tư trồng vùng nguyên liệu mới",
+    decisionRule: "Simple acceptance",
+    expectedDeliveryDays: 10,
+    vatRate: 8,
+    notes: "KH rút yêu cầu, chuyển sang quý 3",
+    status: "Đã hủy",
+    createdAt: "2026-06-05 15:00",
+    quotedAt: "2026-06-06 11:20",
+  },
+];
+
+export type CampaignStatus =
+  | "Lập kế hoạch"
+  | "Đang triển khai"
+  | "Đang phân tích"
+  | "Đã có báo cáo"
+  | "Đã đóng";
+
+export type CampaignPoint = {
+  id: string;
+  code: string;
+  name: string;
+  lat: number;
+  lng: number;
+  values: { criterion: string; value: number; limit: number; unit: string }[];
+};
+
+export type CampaignTrendPoint = {
+  period: string;
+  value: number;
+};
+
+export type Campaign = {
+  id: string;
+  code: string;
+  name: string;
+  scope: string;
+  area: string;
+  client: string;
+  fundingSource: string;
+  purpose: string;
+  matrix: string[];
+  criteria: string[];
+  plannedPoints: number;
+  collectedSamples: number;
+  analyzedSamples: number;
+  startDate: string;
+  endDate: string;
+  status: CampaignStatus;
+  leader: string;
+  reportCode?: string;
+  reportPublishedAt?: string;
+  exceedanceCount?: number;
+  points?: CampaignPoint[];
+  trend?: {
+    criterion: string;
+    unit: string;
+    series: CampaignTrendPoint[];
+  }[];
+};
+
+export const campaigns: Campaign[] = [
+  {
+    id: "cp1",
+    code: "QT-VNNTH-2026-005",
+    name: "Quan trắc đất canh tác lúa vụ Đông Xuân 2026 – Cẩm Thủy",
+    scope: "50 điểm trên 5 xã – mật độ 1 điểm/10 ha",
+    area: "Huyện Cẩm Thủy, Thanh Hóa",
+    client: "Phòng NN&PTNT huyện Cẩm Thủy",
+    fundingSource: "Ngân sách huyện 2026",
+    purpose: "Đánh giá sức khỏe đất sau vụ Đông Xuân, làm cơ sở khuyến cáo bón phân Hè Thu",
+    matrix: ["Đất ruộng lúa 0-20 cm", "Đất ruộng lúa 20-40 cm"],
+    criteria: ["pHKCl", "OM%", "N tổng", "P2O5 dễ tiêu", "K2O dễ tiêu", "CEC"],
+    plannedPoints: 50,
+    collectedSamples: 50,
+    analyzedSamples: 32,
+    startDate: "2026-05-12",
+    endDate: "2026-07-15",
+    status: "Đang phân tích",
+    leader: "Lê Văn Hùng",
+  },
+  {
+    id: "cp2",
+    code: "QT-VNNTH-2026-006",
+    name: "Quan trắc nước tưới kênh Bái Thượng Q2/2026",
+    scope: "25 điểm dọc kênh chính + nhánh – tần suất 1 lần/quý",
+    area: "Hệ thống kênh Bái Thượng – huyện Thọ Xuân",
+    client: "Phòng NN&PTNT huyện Thọ Xuân",
+    fundingSource: "Ngân sách huyện Thọ Xuân 2026",
+    purpose: "Giám sát chất lượng nước tưới phục vụ canh tác lúa và rau màu trên địa bàn",
+    matrix: ["Nước mặt tưới"],
+    criteria: ["pH", "EC", "Coliform", "As", "Pb", "Cd"],
+    plannedPoints: 25,
+    collectedSamples: 25,
+    analyzedSamples: 25,
+    startDate: "2026-04-10",
+    endDate: "2026-06-20",
+    status: "Đã có báo cáo",
+    leader: "Nguyễn Quang Anh",
+    reportCode: "BC-QT-VNNTH-2026-006",
+    reportPublishedAt: "2026-06-24",
+    exceedanceCount: 4,
+    points: [
+      {
+        id: "pt1",
+        code: "K01",
+        name: "Cống cấp nước – Vĩnh Lộc",
+        lat: 19.9421,
+        lng: 105.5034,
+        values: [
+          { criterion: "pH", value: 7.2, limit: 8.5, unit: "" },
+          { criterion: "EC", value: 0.78, limit: 1.5, unit: "mS/cm" },
+          { criterion: "As", value: 0.012, limit: 0.05, unit: "mg/L" },
+          { criterion: "Coliform", value: 80, limit: 200, unit: "CFU/100mL" },
+        ],
+      },
+      {
+        id: "pt2",
+        code: "K05",
+        name: "Cầu Bái Thượng",
+        lat: 19.945,
+        lng: 105.51,
+        values: [
+          { criterion: "pH", value: 7.4, limit: 8.5, unit: "" },
+          { criterion: "EC", value: 0.92, limit: 1.5, unit: "mS/cm" },
+          { criterion: "As", value: 0.018, limit: 0.05, unit: "mg/L" },
+          { criterion: "Coliform", value: 120, limit: 200, unit: "CFU/100mL" },
+        ],
+      },
+      {
+        id: "pt3",
+        code: "K12",
+        name: "Trạm bơm Sao Vàng",
+        lat: 19.9482,
+        lng: 105.5172,
+        values: [
+          { criterion: "pH", value: 7.6, limit: 8.5, unit: "" },
+          { criterion: "EC", value: 1.62, limit: 1.5, unit: "mS/cm" },
+          { criterion: "As", value: 0.061, limit: 0.05, unit: "mg/L" },
+          { criterion: "Coliform", value: 380, limit: 200, unit: "CFU/100mL" },
+        ],
+      },
+      {
+        id: "pt4",
+        code: "K17",
+        name: "Kênh nhánh xã Xuân Sơn",
+        lat: 19.9511,
+        lng: 105.524,
+        values: [
+          { criterion: "pH", value: 7.1, limit: 8.5, unit: "" },
+          { criterion: "EC", value: 0.85, limit: 1.5, unit: "mS/cm" },
+          { criterion: "As", value: 0.022, limit: 0.05, unit: "mg/L" },
+          { criterion: "Coliform", value: 160, limit: 200, unit: "CFU/100mL" },
+        ],
+      },
+      {
+        id: "pt5",
+        code: "K22",
+        name: "Hợp lưu kênh Bái Thượng – sông Cầu Chày",
+        lat: 19.9544,
+        lng: 105.5318,
+        values: [
+          { criterion: "pH", value: 7.8, limit: 8.5, unit: "" },
+          { criterion: "EC", value: 1.71, limit: 1.5, unit: "mS/cm" },
+          { criterion: "As", value: 0.048, limit: 0.05, unit: "mg/L" },
+          { criterion: "Coliform", value: 240, limit: 200, unit: "CFU/100mL" },
+        ],
+      },
+    ],
+    trend: [
+      {
+        criterion: "As trung bình",
+        unit: "mg/L",
+        series: [
+          { period: "Q3/2025", value: 0.018 },
+          { period: "Q4/2025", value: 0.021 },
+          { period: "Q1/2026", value: 0.027 },
+          { period: "Q2/2026", value: 0.032 },
+        ],
+      },
+      {
+        criterion: "Coliform trung bình",
+        unit: "CFU/100mL",
+        series: [
+          { period: "Q3/2025", value: 95 },
+          { period: "Q4/2025", value: 110 },
+          { period: "Q1/2026", value: 145 },
+          { period: "Q2/2026", value: 195 },
+        ],
+      },
+    ],
+  },
+  {
+    id: "cp3",
+    code: "QT-VNNTH-2026-007",
+    name: "Giám sát dư lượng BVTV nông sản rau quả tháng 6/2026",
+    scope: "30 điểm trên 4 vùng trọng điểm – chọn ngẫu nhiên tại chợ và HTX",
+    area: "Yên Định + Hậu Lộc + Hà Trung + TP Thanh Hóa",
+    client: "Sở NN&PTNT Thanh Hóa",
+    fundingSource: "Đề án ATTP nông sản 2026",
+    purpose: "Cảnh báo sớm dư lượng BVTV vượt MRL trên rau quả tiêu thụ tại địa bàn",
+    matrix: ["Rau cải", "Cà chua", "Đậu cô ve", "Nho"],
+    criteria: [
+      "Chlorpyrifos",
+      "Cypermethrin",
+      "Carbendazim",
+      "Abamectin",
+      "Imidacloprid",
+      "Profenofos",
+      "Metalaxyl",
+      "Acetamiprid",
+      "Permethrin",
+      "Difenoconazole",
+      "Lambda-cyhalothrin",
+      "Fipronil",
+    ],
+    plannedPoints: 30,
+    collectedSamples: 18,
+    analyzedSamples: 6,
+    startDate: "2026-06-05",
+    endDate: "2026-07-10",
+    status: "Đang triển khai",
+    leader: "Phạm Thu Hà",
+  },
+  {
+    id: "cp4",
+    code: "QT-VNNTH-2026-008",
+    name: "Đánh giá thoái hóa đất nông nghiệp Hà Trung 2026",
+    scope: "40 điểm so sánh với cơ sở dữ liệu 2018 – đánh giá xu hướng 8 năm",
+    area: "Huyện Hà Trung, Thanh Hóa",
+    client: "UBND huyện Hà Trung",
+    fundingSource: "Ngân sách tỉnh – đề án thoái hóa đất",
+    purpose:
+      "Lập bản đồ phân vùng đất thoái hóa, đề xuất chương trình cải tạo giai đoạn 2026–2030",
+    matrix: ["Đất canh tác", "Đất vườn", "Đất đồi nông nghiệp"],
+    criteria: [
+      "pHKCl",
+      "OM%",
+      "N tổng",
+      "CEC",
+      "Mg trao đổi",
+      "Ca trao đổi",
+      "Độ chua trao đổi",
+      "Pb",
+      "Cd",
+    ],
+    plannedPoints: 40,
+    collectedSamples: 0,
+    analyzedSamples: 0,
+    startDate: "2026-07-05",
+    endDate: "2026-10-30",
+    status: "Lập kế hoạch",
+    leader: "Lê Văn Hùng",
+  },
+];
+
+export type ResultWorkflowStep = "KTV nhập" | "QA/QC kiểm tra" | "Trưởng phòng duyệt";
+
+export type ResultStatus =
+  | "Đang nhập"
+  | "Chờ QA/QC"
+  | "Chờ Trưởng phòng"
+  | "Đã duyệt"
+  | "Trả lại sửa";
+
+export type Conclusion = "Đạt" | "Không đạt" | "Vô định" | "Báo cáo giá trị";
+
+export type Replicate = { id: number; value: number; note?: string };
+
+export type RawFile = {
+  name: string;
+  kind: "Instrument log" | "CSV raw" | "Báo cáo PDF" | "Ảnh sắc đồ";
+  size: string;
+  uploadedAt: string;
+  uploadedBy: string;
+  hash: string;
+};
+
+export type ApprovalRecord = {
+  step: ResultWorkflowStep;
+  actor: string;
+  role: string;
+  decision: "Đạt" | "Trả lại sửa" | "Chờ";
+  comment?: string;
+  signedAt?: string;
+};
+
+export type AuditEvent = {
+  at: string;
+  actor: string;
+  action: string;
+  detail?: string;
+  field?: string;
+  oldValue?: string;
+  newValue?: string;
+};
+
+export type AnalysisResult = {
+  id: string;
+  resultCode: string;
+  sampleCode: string;
+  customerName: string;
+  matrix: string;
+  criterion: string;
+  unit: string;
+  method: string;
+  instrument: { code: string; name: string };
+  referenceMaterial: string;
+  technician: string;
+  startedAt: string;
+  finishedAt?: string;
+  replicates: Replicate[];
+  mean: number;
+  sd: number;
+  rsd: number;
+  uncertainty: number;
+  matrixSpikeRecovery: number;
+  blankBlankValue: number;
+  decisionRuleId: string;
+  decisionRuleType: string;
+  decisionLimit: number;
+  acceptanceUpper: number;
+  rejectionUpper: number;
+  conclusion: Conclusion;
+  conclusionExplanation: string;
+  rawFiles: RawFile[];
+  status: ResultStatus;
+  approvals: ApprovalRecord[];
+  auditTrail: AuditEvent[];
+  qaComment?: string;
+  managerComment?: string;
+};
+
+export const analysisResults: AnalysisResult[] = [
+  {
+    id: "ar1",
+    resultCode: "KQ-VNNTH-2026-00782",
+    sampleCode: "M-VNNTH-2026-00320",
+    customerName: "Trang trại Rau an toàn Yên Định",
+    matrix: "Rau cải lá (Brassica)",
+    criterion: "Pb tổng",
+    unit: "mg/kg",
+    method: "ICP-MS – TCVN 7929:2008",
+    instrument: {
+      code: "TB-ICP-01",
+      name: "ICP-MS PerkinElmer NexION 2000",
+    },
+    referenceMaterial: "CRM NIST 1573a Tomato Leaves (chứng nhận 1.59 mg/kg Pb)",
+    technician: "Phạm Thu Hà",
+    startedAt: "2026-06-22 09:15",
+    finishedAt: "2026-06-22 14:35",
+    replicates: [
+      { id: 1, value: 0.232 },
+      { id: 2, value: 0.241 },
+      { id: 3, value: 0.238 },
+      { id: 4, value: 0.235 },
+      { id: 5, value: 0.239 },
+    ],
+    mean: 0.237,
+    sd: 0.0036,
+    rsd: 1.52,
+    uncertainty: 0.018,
+    matrixSpikeRecovery: 98.2,
+    blankBlankValue: 0.002,
+    decisionRuleId: "dr1",
+    decisionRuleType: "Guarded acceptance (w = U)",
+    decisionLimit: 0.3,
+    acceptanceUpper: 0.26,
+    rejectionUpper: 0.34,
+    conclusion: "Đạt",
+    conclusionExplanation:
+      "Kết quả + U = 0.255 mg/kg ≤ ngưỡng chấp nhận 0.26 mg/kg. Kết luận ĐẠT QCVN 8-2:2011/BYT với mức tin cậy 95%.",
+    rawFiles: [
+      {
+        name: "ICPMS_20260622_RUNS_320.csv",
+        kind: "CSV raw",
+        size: "1.8 MB",
+        uploadedAt: "2026-06-22 14:32",
+        uploadedBy: "Phạm Thu Hà",
+        hash: "sha256:a7f9...c1e3",
+      },
+      {
+        name: "Calibration_curve_Pb_20260622.pdf",
+        kind: "Báo cáo PDF",
+        size: "412 KB",
+        uploadedAt: "2026-06-22 14:33",
+        uploadedBy: "Phạm Thu Hà",
+        hash: "sha256:b1d2...8af0",
+      },
+      {
+        name: "Instrument_log_NexION_220626.txt",
+        kind: "Instrument log",
+        size: "72 KB",
+        uploadedAt: "2026-06-22 14:34",
+        uploadedBy: "Phạm Thu Hà",
+        hash: "sha256:c8e4...5fa9",
+      },
+    ],
+    status: "Đã duyệt",
+    approvals: [
+      {
+        step: "KTV nhập",
+        actor: "Phạm Thu Hà",
+        role: "Kỹ thuật viên – Nhóm Dư lượng BVTV & ATTP",
+        decision: "Đạt",
+        comment: "Đã hoàn thành 5 phép lặp + CRM + mẫu trắng. RSD 1.52% < 5% (đạt).",
+        signedAt: "2026-06-22 14:40",
+      },
+      {
+        step: "QA/QC kiểm tra",
+        actor: "Trần Thị Mai",
+        role: "Phó phòng – Phụ trách QA/QC",
+        decision: "Đạt",
+        comment:
+          "RSD 1.52% nằm trong giới hạn nội bộ < 5%. CRM recovery 98.2% (giới hạn 90–110%). Mẫu trắng 0.002 mg/kg < LOQ. Đối chiếu Levey-Jennings: trong kiểm soát, không vi phạm Westgard. → Đồng ý.",
+        signedAt: "2026-06-22 15:18",
+      },
+      {
+        step: "Trưởng phòng duyệt",
+        actor: "Nguyễn Đình Lương",
+        role: "Trưởng phòng PTN",
+        decision: "Đạt",
+        comment:
+          "Kết quả phù hợp quy tắc quyết định DR-01 (Guarded acceptance, k=2). Đã ký số phát hành phiếu KQ.",
+        signedAt: "2026-06-22 16:08",
+      },
+    ],
+    qaComment:
+      "Đã đối chiếu với biểu đồ Levey-Jennings chỉ tiêu Pb đất – nằm trong vùng kiểm soát, không vi phạm Westgard.",
+    managerComment:
+      "Kết quả đủ điều kiện phát hành phiếu KQ cho KH. Tự động đẩy sang /reports để ký số.",
+    auditTrail: [
+      {
+        at: "2026-06-22 09:15",
+        actor: "Phạm Thu Hà",
+        action: "Khởi tạo phiếu phân tích",
+        detail: "Gắn với chỉ tiêu Pb tổng của mẫu M-VNNTH-2026-00320",
+      },
+      {
+        at: "2026-06-22 09:18",
+        actor: "Phạm Thu Hà",
+        action: "Chọn thiết bị & PP",
+        detail: "TB-ICP-01 · ICP-MS – TCVN 7929:2008",
+      },
+      {
+        at: "2026-06-22 09:25",
+        actor: "Hệ thống",
+        action: "Tự kiểm tra điều kiện vận hành",
+        detail:
+          "Thiết bị còn hạn hiệu chuẩn (đến 2026-06-02 → cảnh báo, cho phép tiếp tục có ghi chú)",
+      },
+      {
+        at: "2026-06-22 14:18",
+        actor: "Phạm Thu Hà",
+        action: "Nhập 5 phép lặp",
+        field: "Replicate values",
+        newValue: "0.232; 0.241; 0.238; 0.235; 0.239",
+      },
+      {
+        at: "2026-06-22 14:20",
+        actor: "Hệ thống",
+        action: "Tính thống kê",
+        detail: "x̄ = 0.237 · SD = 0.0036 · RSD = 1.52% · U(k=2) = 0.018",
+      },
+      {
+        at: "2026-06-22 14:21",
+        actor: "Hệ thống",
+        action: "Áp quy tắc quyết định DR-01",
+        detail: "0.237 + 0.018 = 0.255 ≤ 0.26 → ĐẠT",
+      },
+      {
+        at: "2026-06-22 14:32",
+        actor: "Phạm Thu Hà",
+        action: "Đính kèm 3 raw file",
+        detail: "ICPMS_20260622_RUNS_320.csv · Calibration_curve_Pb.pdf · Instrument_log",
+      },
+      {
+        at: "2026-06-22 14:38",
+        actor: "Phạm Thu Hà",
+        action: "Sửa ghi chú",
+        field: "Conclusion explanation",
+        oldValue: "(trống)",
+        newValue:
+          "Kết quả + U = 0.255 mg/kg ≤ ngưỡng chấp nhận 0.26 mg/kg.",
+      },
+      {
+        at: "2026-06-22 14:40",
+        actor: "Phạm Thu Hà",
+        action: "Nộp cho QA/QC",
+      },
+      {
+        at: "2026-06-22 15:10",
+        actor: "Trần Thị Mai",
+        action: "Mở duyệt QA/QC",
+      },
+      {
+        at: "2026-06-22 15:18",
+        actor: "Trần Thị Mai",
+        action: "Duyệt QA/QC – Đạt",
+        detail: "Đối chiếu Levey-Jennings: trong kiểm soát",
+      },
+      {
+        at: "2026-06-22 16:00",
+        actor: "Nguyễn Đình Lương",
+        action: "Mở duyệt cuối",
+      },
+      {
+        at: "2026-06-22 16:08",
+        actor: "Nguyễn Đình Lương",
+        action: "Duyệt – Đã ký số",
+        detail: "Phát hành phiếu KQ tự động sang /reports",
+      },
+    ],
+  },
+  {
+    id: "ar2",
+    resultCode: "KQ-VNNTH-2026-00785",
+    sampleCode: "M-VNNTH-2026-00318",
+    customerName: "HTX Nông nghiệp Đông Sơn",
+    matrix: "Đất canh tác lúa",
+    criterion: "OM% (Walkley-Black)",
+    unit: "%",
+    method: "TCVN 8941:2011",
+    instrument: { code: "TB-AUTO-01", name: "Máy chuẩn độ tự động Metrohm" },
+    referenceMaterial: "Mẫu chuẩn nội bộ đất Hà Trung (2.85%)",
+    technician: "Trần Thị Mai",
+    startedAt: "2026-06-23 08:00",
+    replicates: [
+      { id: 1, value: 2.78 },
+      { id: 2, value: 2.84 },
+      { id: 3, value: 2.81 },
+    ],
+    mean: 2.81,
+    sd: 0.03,
+    rsd: 1.07,
+    uncertainty: 0.14,
+    matrixSpikeRecovery: 96.1,
+    blankBlankValue: 0.05,
+    decisionRuleId: "—",
+    decisionRuleType: "Simple acceptance (báo cáo giá trị)",
+    decisionLimit: 0,
+    acceptanceUpper: 0,
+    rejectionUpper: 0,
+    conclusion: "Báo cáo giá trị",
+    conclusionExplanation:
+      "Chỉ tiêu OM% trả về giá trị + U cho KH dùng tham chiếu khuyến cáo bón vôi/phân, không áp ngưỡng đạt/không đạt.",
+    rawFiles: [
+      {
+        name: "Titrando_log_20260623.txt",
+        kind: "Instrument log",
+        size: "48 KB",
+        uploadedAt: "2026-06-23 11:42",
+        uploadedBy: "Trần Thị Mai",
+        hash: "sha256:d4e5...90bc",
+      },
+    ],
+    status: "Chờ QA/QC",
+    approvals: [
+      {
+        step: "KTV nhập",
+        actor: "Trần Thị Mai",
+        role: "Kỹ thuật viên – Nhóm Đất & Phân bón",
+        decision: "Đạt",
+        signedAt: "2026-06-23 11:50",
+      },
+      {
+        step: "QA/QC kiểm tra",
+        actor: "—",
+        role: "—",
+        decision: "Chờ",
+      },
+      {
+        step: "Trưởng phòng duyệt",
+        actor: "—",
+        role: "—",
+        decision: "Chờ",
+      },
+    ],
+    auditTrail: [
+      {
+        at: "2026-06-23 08:00",
+        actor: "Trần Thị Mai",
+        action: "Khởi tạo phiếu phân tích",
+      },
+      {
+        at: "2026-06-23 11:30",
+        actor: "Trần Thị Mai",
+        action: "Nhập 3 phép lặp",
+        newValue: "2.78; 2.84; 2.81",
+      },
+      {
+        at: "2026-06-23 11:42",
+        actor: "Trần Thị Mai",
+        action: "Đính kèm raw file",
+      },
+      {
+        at: "2026-06-23 11:50",
+        actor: "Trần Thị Mai",
+        action: "Nộp cho QA/QC",
+      },
+    ],
+  },
+  {
+    id: "ar3",
+    resultCode: "KQ-VNNTH-2026-00779",
+    sampleCode: "M-VNNTH-2026-00315",
+    customerName: "Công ty CP Phân bón Tiến Nông",
+    matrix: "Phân bón NPK 16-16-8",
+    criterion: "P2O5 hữu hiệu",
+    unit: "%",
+    method: "TCVN 8559:2010",
+    instrument: { code: "TB-UV-02", name: "Quang phổ UV-VIS Shimadzu" },
+    referenceMaterial: "Mẫu chuẩn nội bộ NPK 16-16-8",
+    technician: "Đỗ Minh Tuấn",
+    startedAt: "2026-06-21 13:00",
+    replicates: [
+      { id: 1, value: 14.8 },
+      { id: 2, value: 14.6 },
+      { id: 3, value: 14.9 },
+    ],
+    mean: 14.77,
+    sd: 0.15,
+    rsd: 1.04,
+    uncertainty: 0.42,
+    matrixSpikeRecovery: 95.4,
+    blankBlankValue: 0.1,
+    decisionRuleId: "dr6",
+    decisionRuleType: "Guarded acceptance (w = U) – 2 phía",
+    decisionLimit: 16.5,
+    acceptanceUpper: 16.18,
+    rejectionUpper: 16.5,
+    conclusion: "Không đạt",
+    conclusionExplanation:
+      "Kết quả 14.77% < ngưỡng chấp nhận thấp 15.82%. Kết luận KHÔNG ĐẠT theo NĐ 84/2019/NĐ-CP (dung sai ±0.5%).",
+    rawFiles: [
+      {
+        name: "UV-VIS_P2O5_20260621.csv",
+        kind: "CSV raw",
+        size: "120 KB",
+        uploadedAt: "2026-06-21 16:42",
+        uploadedBy: "Đỗ Minh Tuấn",
+        hash: "sha256:e2a7...7c8d",
+      },
+    ],
+    status: "Trả lại sửa",
+    approvals: [
+      {
+        step: "KTV nhập",
+        actor: "Đỗ Minh Tuấn",
+        role: "Kỹ thuật viên – Nhóm Đất & Phân bón",
+        decision: "Đạt",
+        signedAt: "2026-06-21 16:50",
+      },
+      {
+        step: "QA/QC kiểm tra",
+        actor: "Trần Thị Mai",
+        role: "Phó phòng – QA/QC",
+        decision: "Trả lại sửa",
+        comment:
+          "CRM recovery 95.4% còn trong giới hạn nhưng yêu cầu chạy thêm 2 phép lặp để giảm U. P2O5 nằm trong vùng quan trọng pháp lý – KH cần độ chắc chắn cao.",
+        signedAt: "2026-06-21 17:30",
+      },
+      {
+        step: "Trưởng phòng duyệt",
+        actor: "—",
+        role: "—",
+        decision: "Chờ",
+      },
+    ],
+    qaComment: "Yêu cầu chạy thêm 2 phép lặp + xem lại đường chuẩn",
+    auditTrail: [
+      {
+        at: "2026-06-21 13:00",
+        actor: "Đỗ Minh Tuấn",
+        action: "Khởi tạo phiếu",
+      },
+      {
+        at: "2026-06-21 16:30",
+        actor: "Đỗ Minh Tuấn",
+        action: "Nhập 3 phép lặp",
+        newValue: "14.8; 14.6; 14.9",
+      },
+      {
+        at: "2026-06-21 16:50",
+        actor: "Đỗ Minh Tuấn",
+        action: "Nộp cho QA/QC",
+      },
+      {
+        at: "2026-06-21 17:30",
+        actor: "Trần Thị Mai",
+        action: "Trả lại sửa",
+        detail: "Yêu cầu chạy thêm 2 phép lặp – chuyển trạng thái về KTV",
+      },
+    ],
+  },
+];
+
 export const dashboardKpis = {
   sampleTotal: samples.length,
   sampleInProgress: samples.filter((s) =>

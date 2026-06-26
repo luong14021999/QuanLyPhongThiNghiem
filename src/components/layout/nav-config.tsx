@@ -16,6 +16,9 @@ import {
   AlertOctagon,
   Scale,
   Smartphone,
+  FileSignature,
+  Telescope,
+  ClipboardEdit,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -31,9 +34,12 @@ export const navGroups: NavGroup[] = [
   {
     label: "Nghiệp vụ",
     items: [
+      { href: "/test-requests", label: "Phiếu yêu cầu thử nghiệm", icon: FileSignature },
+      { href: "/campaigns", label: "Quan trắc theo đợt", icon: Telescope },
       { href: "/field", label: "Lấy mẫu hiện trường", icon: Smartphone },
       { href: "/samples", label: "Tiếp nhận mẫu", icon: ClipboardList },
       { href: "/analysis", label: "Quy trình phân tích", icon: FlaskConical },
+      { href: "/result-entry", label: "Nhập kết quả & duyệt", icon: ClipboardEdit },
       { href: "/archive", label: "Kho mẫu lưu", icon: Archive },
     ],
   },
