@@ -109,7 +109,7 @@ export default function PersonnelPage() {
                 </CardDescription>
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 rounded-md border border-input bg-background px-2.5 h-9 text-sm w-56">
+                <div className="flex items-center gap-2 rounded-md border border-input bg-background px-2.5 h-9 text-sm w-full sm:w-56">
                   <Search className="w-4 h-4 text-muted-foreground" />
                   <input
                     className="bg-transparent outline-none flex-1"

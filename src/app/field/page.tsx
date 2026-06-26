@@ -222,7 +222,7 @@ function FieldSampleCard({ sample }: { sample: FieldSample }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-[1fr_auto] gap-3">
+      <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
         <div className="space-y-2 min-w-0">
           <div className="flex items-start gap-2 text-xs">
             <MapPin className="w-3.5 h-3.5 text-emerald-600 mt-0.5 shrink-0" />
@@ -254,7 +254,7 @@ function FieldSampleCard({ sample }: { sample: FieldSample }) {
             </div>
           </div>
         </div>
-        <div className="w-32 shrink-0">
+        <div className="w-full sm:w-32 shrink-0">
           <MiniMap lat={sample.location.lat} lng={sample.location.lng} />
         </div>
       </div>

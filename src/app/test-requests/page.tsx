@@ -191,7 +191,7 @@ export default function TestRequestsPage() {
               </CardDescription>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-2 rounded-md border border-input bg-background px-2.5 h-9 text-sm w-56">
+              <div className="flex items-center gap-2 rounded-md border border-input bg-background px-2.5 h-9 text-sm w-full sm:w-56">
                 <Search className="w-4 h-4 text-muted-foreground" />
                 <input
                   className="bg-transparent outline-none flex-1"
@@ -384,8 +384,8 @@ export default function TestRequestsPage() {
                 <div className="text-[11px] uppercase text-muted-foreground mb-2">
                   Báo giá theo chỉ tiêu
                 </div>
-                <div className="rounded-lg border overflow-hidden">
-                  <table className="w-full text-xs">
+                <div className="rounded-lg border overflow-x-auto">
+                  <table className="w-full text-xs min-w-[480px]">
                     <thead className="bg-muted/40">
                       <tr>
                         <th className="text-left p-2">Chỉ tiêu</th>

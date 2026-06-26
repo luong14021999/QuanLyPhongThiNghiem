@@ -326,7 +326,7 @@ export default function CampaignsPage() {
               </CardDescription>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-2 rounded-md border border-input bg-background px-2.5 h-9 text-sm w-56">
+              <div className="flex items-center gap-2 rounded-md border border-input bg-background px-2.5 h-9 text-sm w-full sm:w-56">
                 <Search className="w-4 h-4 text-muted-foreground" />
                 <input
                   className="bg-transparent outline-none flex-1"
@@ -506,8 +506,8 @@ export default function CampaignsPage() {
                 <div className="text-[11px] font-semibold uppercase text-muted-foreground mb-2">
                   Matrix điểm × chỉ tiêu
                 </div>
-                <div className="rounded-lg border">
-                  <table className="w-full text-xs">
+                <div className="rounded-lg border overflow-x-auto">
+                  <table className="w-full text-xs min-w-[560px]">
                     <thead className="bg-muted/40">
                       <tr>
                         <th className="text-left p-2">Điểm</th>
