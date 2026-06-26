@@ -75,22 +75,22 @@ export const navGroups: NavGroup[] = [
 
 export function SidebarBrand() {
   return (
-    <div className="h-16 flex items-center gap-3 px-4 border-b border-sidebar-border">
-      <div className="w-10 h-10 rounded-full bg-white ring-1 ring-white/40 flex items-center justify-center shrink-0 overflow-hidden">
+    <div className="min-h-16 py-2 flex items-center gap-2.5 px-3 border-b border-sidebar-border">
+      <div className="w-9 h-9 rounded-full bg-white ring-1 ring-white/40 flex items-center justify-center shrink-0 overflow-hidden">
         <Image
           src="/logo-vnnth.png"
           alt="Viện Nông Nghiệp Thanh Hóa"
-          width={40}
-          height={40}
-          className="w-10 h-10 object-contain"
+          width={36}
+          height={36}
+          className="w-9 h-9 object-contain"
           priority
         />
       </div>
-      <div className="leading-tight min-w-0">
-        <div className="text-sm font-semibold text-white truncate">
+      <div className="leading-tight min-w-0 flex-1">
+        <div className="text-[13px] font-semibold text-white leading-snug">
           Viện Nông Nghiệp Thanh Hóa
         </div>
-        <div className="text-[11px] text-sidebar-foreground/60 truncate">
+        <div className="text-[10.5px] text-sidebar-foreground/60 mt-0.5 leading-snug">
           PTN Môi trường · Đất · Nước · Phân bón · ATTP
         </div>
       </div>
