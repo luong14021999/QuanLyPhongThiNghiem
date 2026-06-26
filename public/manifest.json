@@ -11,10 +11,10 @@
   "lang": "vi",
   "icons": [
     {
-      "src": "/icon-leaf.svg",
+      "src": "/logo-vnnth.png",
       "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "shortcuts": [

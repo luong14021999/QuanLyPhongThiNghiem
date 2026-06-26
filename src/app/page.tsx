@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   ClipboardList,
   FlaskConical,
@@ -49,9 +50,16 @@ export default function DashboardPage() {
         description="Số hóa quy trình nhận mẫu · phân tích · thiết bị · hóa chất theo ISO/IEC 17025"
       />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 scrollbar-thin">
-        <section className="rounded-xl border bg-primary/5 p-5 flex flex-col sm:flex-row sm:items-center gap-4">
-          <div className="w-12 h-12 rounded-lg bg-primary/15 text-primary flex items-center justify-center shrink-0">
-            <FlaskConical className="w-6 h-6" />
+        <section className="rounded-xl border bg-primary/5 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <div className="w-16 h-16 rounded-full bg-white ring-1 ring-primary/20 flex items-center justify-center shrink-0 overflow-hidden">
+            <Image
+              src="/logo-vnnth.png"
+              alt="Viện Nông Nghiệp Thanh Hóa"
+              width={64}
+              height={64}
+              className="w-16 h-16 object-contain"
+              priority
+            />
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-sm font-semibold">
@@ -63,7 +71,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary">ISO/IEC 17025</Badge>
+            <Badge variant="secondary">ISO/IEC 17025:2017</Badge>
             <Badge variant="outline">VILAS 1234</Badge>
           </div>
         </section>

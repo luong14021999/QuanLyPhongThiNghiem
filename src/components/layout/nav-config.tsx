@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   LayoutDashboard,
   ClipboardList,
@@ -7,7 +8,6 @@ import {
   Beaker,
   FileText,
   Settings,
-  Sprout,
   Users,
   TestTube,
   Users2,
@@ -75,9 +75,16 @@ export const navGroups: NavGroup[] = [
 
 export function SidebarBrand() {
   return (
-    <div className="h-16 flex items-center gap-3 px-5 border-b border-sidebar-border">
-      <div className="w-9 h-9 rounded-lg bg-primary/20 ring-1 ring-primary/40 flex items-center justify-center">
-        <Sprout className="w-5 h-5 text-primary" />
+    <div className="h-16 flex items-center gap-3 px-4 border-b border-sidebar-border">
+      <div className="w-10 h-10 rounded-full bg-white ring-1 ring-white/40 flex items-center justify-center shrink-0 overflow-hidden">
+        <Image
+          src="/logo-vnnth.png"
+          alt="Viện Nông Nghiệp Thanh Hóa"
+          width={40}
+          height={40}
+          className="w-10 h-10 object-contain"
+          priority
+        />
       </div>
       <div className="leading-tight min-w-0">
         <div className="text-sm font-semibold text-white truncate">
