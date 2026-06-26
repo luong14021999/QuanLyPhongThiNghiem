@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   AlertOctagon,
   Scale,
+  Smartphone,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -30,6 +31,7 @@ export const navGroups: NavGroup[] = [
   {
     label: "Nghiệp vụ",
     items: [
+      { href: "/field", label: "Lấy mẫu hiện trường", icon: Smartphone },
       { href: "/samples", label: "Tiếp nhận mẫu", icon: ClipboardList },
       { href: "/analysis", label: "Quy trình phân tích", icon: FlaskConical },
       { href: "/archive", label: "Kho mẫu lưu", icon: Archive },

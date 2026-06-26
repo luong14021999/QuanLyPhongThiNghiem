@@ -1873,6 +1873,264 @@ export const decisionRules: DecisionRule[] = [
   },
 ];
 
+export type SamplingSessionStatus =
+  | "Đang chuẩn bị"
+  | "Đang triển khai"
+  | "Đã hoàn tất"
+  | "Đã đóng";
+
+export type SamplingSession = {
+  id: string;
+  code: string;
+  name: string;
+  area: string;
+  leader: string;
+  team: string[];
+  vehicle: string;
+  startedAt: string;
+  endedAt?: string;
+  customer: string;
+  matrix: string[];
+  status: SamplingSessionStatus;
+  plannedSamples: number;
+  collectedSamples: number;
+  syncedSamples: number;
+};
+
+export const samplingSessions: SamplingSession[] = [
+  {
+    id: "ss1",
+    code: "LM-VNNTH-2026-018",
+    name: "Quan trắc đất canh tác lúa Đông Sơn vụ Đông Xuân",
+    area: "Xã Cẩm Thành & Cẩm Tâm – huyện Cẩm Thủy, Thanh Hóa",
+    leader: "Lê Văn Hùng",
+    team: ["Lê Văn Hùng", "Đỗ Minh Tuấn", "Hoàng Thị Linh"],
+    vehicle: "Ô tô bán tải 36C-12345",
+    startedAt: "2026-06-19 07:00",
+    customer: "HTX Nông nghiệp Đông Sơn",
+    matrix: ["Đất canh tác lúa", "Nước tưới ruộng"],
+    status: "Đang triển khai",
+    plannedSamples: 12,
+    collectedSamples: 9,
+    syncedSamples: 6,
+  },
+  {
+    id: "ss2",
+    code: "LM-VNNTH-2026-017",
+    name: "Lấy mẫu rau cải dư lượng BVTV – Yên Định",
+    area: "Xã Định Tường, huyện Yên Định, Thanh Hóa",
+    leader: "Phạm Thu Hà",
+    team: ["Phạm Thu Hà", "Hoàng Thị Linh"],
+    vehicle: "Xe máy 36AB-78901 + 36AB-78902",
+    startedAt: "2026-06-21 06:30",
+    customer: "Trang trại Rau an toàn Yên Định",
+    matrix: ["Rau cải lá", "Đất rau"],
+    status: "Đang triển khai",
+    plannedSamples: 8,
+    collectedSamples: 3,
+    syncedSamples: 0,
+  },
+  {
+    id: "ss3",
+    code: "LM-VNNTH-2026-015",
+    name: "Quan trắc nước tưới kênh nội đồng Q2/2026",
+    area: "Hệ thống kênh Bái Thượng – huyện Thọ Xuân, Thanh Hóa",
+    leader: "Nguyễn Quang Anh",
+    team: ["Nguyễn Quang Anh", "Trần Thị Mai"],
+    vehicle: "Ô tô con 36A-22113",
+    startedAt: "2026-06-10 06:00",
+    endedAt: "2026-06-12 17:30",
+    customer: "Phòng NN&PTNT huyện Thọ Xuân",
+    matrix: ["Nước tưới mặt"],
+    status: "Đã hoàn tất",
+    plannedSamples: 25,
+    collectedSamples: 25,
+    syncedSamples: 25,
+  },
+];
+
+export type FieldSampleStatus =
+  | "Đang thu"
+  | "Chờ đồng bộ"
+  | "Đã đồng bộ"
+  | "Đã chuyển vào PTN";
+
+export type OnSiteReading = { name: string; value: string; unit: string };
+
+export type FieldSample = {
+  id: string;
+  fieldCode: string;
+  sessionCode: string;
+  matrix: string;
+  collectorName: string;
+  collectedAt: string;
+  location: { lat: number; lng: number; address: string };
+  depth?: string;
+  amount: string;
+  container: string;
+  preservation: string;
+  onSiteReadings: OnSiteReading[];
+  photos: number;
+  hasSignature: boolean;
+  status: FieldSampleStatus;
+  linkedSampleCode?: string;
+  notes?: string;
+};
+
+export const fieldSamples: FieldSample[] = [
+  {
+    id: "fs1",
+    fieldCode: "FM-VNNTH-2026-00451",
+    sessionCode: "LM-VNNTH-2026-018",
+    matrix: "Đất ruộng lúa – tầng 0-20 cm",
+    collectorName: "Lê Văn Hùng",
+    collectedAt: "2026-06-22 08:45",
+    location: {
+      lat: 20.1736,
+      lng: 105.4658,
+      address: "Thửa số 27, cánh đồng Cẩm Thành, Cẩm Thủy",
+    },
+    depth: "0–20 cm",
+    amount: "≈ 1.2 kg",
+    container: "Túi PE kín, dán nhãn QR",
+    preservation: "Nhiệt độ phòng, tránh ẩm",
+    onSiteReadings: [
+      { name: "Nhiệt độ đất", value: "27.3", unit: "°C" },
+      { name: "Độ ẩm đất", value: "62", unit: "%" },
+      { name: "pH cầm tay", value: "5.4", unit: "" },
+    ],
+    photos: 3,
+    hasSignature: true,
+    status: "Đã đồng bộ",
+    linkedSampleCode: "M-VNNTH-2026-00451",
+  },
+  {
+    id: "fs2",
+    fieldCode: "FM-VNNTH-2026-00452",
+    sessionCode: "LM-VNNTH-2026-018",
+    matrix: "Nước tưới mương ruộng",
+    collectorName: "Đỗ Minh Tuấn",
+    collectedAt: "2026-06-22 09:20",
+    location: {
+      lat: 20.1742,
+      lng: 105.4671,
+      address: "Mương cấp 2 – cánh đồng Cẩm Thành",
+    },
+    amount: "1.0 L",
+    container: "Chai PE, axit hóa pH<2 bằng HNO3",
+    preservation: "Bảo quản lạnh 2-8°C",
+    onSiteReadings: [
+      { name: "pH", value: "7.1", unit: "" },
+      { name: "EC", value: "0.92", unit: "mS/cm" },
+      { name: "Nhiệt độ nước", value: "29.5", unit: "°C" },
+      { name: "DO", value: "5.8", unit: "mg/L" },
+    ],
+    photos: 2,
+    hasSignature: true,
+    status: "Đã đồng bộ",
+    linkedSampleCode: "M-VNNTH-2026-00452",
+  },
+  {
+    id: "fs3",
+    fieldCode: "FM-VNNTH-2026-00455",
+    sessionCode: "LM-VNNTH-2026-018",
+    matrix: "Đất ruộng lúa – tầng 20-40 cm",
+    collectorName: "Hoàng Thị Linh",
+    collectedAt: "2026-06-22 11:05",
+    location: {
+      lat: 20.1755,
+      lng: 105.4682,
+      address: "Thửa số 31, cánh đồng Cẩm Tâm, Cẩm Thủy",
+    },
+    depth: "20–40 cm",
+    amount: "≈ 1.0 kg",
+    container: "Túi PE kín, dán nhãn QR",
+    preservation: "Nhiệt độ phòng",
+    onSiteReadings: [
+      { name: "Nhiệt độ đất", value: "26.8", unit: "°C" },
+      { name: "pH cầm tay", value: "5.2", unit: "" },
+    ],
+    photos: 4,
+    hasSignature: true,
+    status: "Chờ đồng bộ",
+    notes: "Ngoài vùng phủ sóng – chờ về Viện đồng bộ",
+  },
+  {
+    id: "fs4",
+    fieldCode: "FM-VNNTH-2026-00458",
+    sessionCode: "LM-VNNTH-2026-017",
+    matrix: "Rau cải lá – ruộng A1",
+    collectorName: "Phạm Thu Hà",
+    collectedAt: "2026-06-22 07:15",
+    location: {
+      lat: 19.9758,
+      lng: 105.6611,
+      address: "Vườn rau số 12, Định Tường, Yên Định",
+    },
+    amount: "≈ 500 g",
+    container: "Túi giấy bạc, kín khí",
+    preservation: "Bảo quản đông sâu -20°C ngay khi về xe",
+    onSiteReadings: [
+      { name: "Nhiệt độ không khí", value: "31.2", unit: "°C" },
+      { name: "Độ ẩm", value: "78", unit: "%" },
+    ],
+    photos: 5,
+    hasSignature: true,
+    status: "Đang thu",
+    notes: "Đang ghi nhận lịch sử phun BVTV của KH",
+  },
+  {
+    id: "fs5",
+    fieldCode: "FM-VNNTH-2026-00459",
+    sessionCode: "LM-VNNTH-2026-017",
+    matrix: "Đất trồng rau – ruộng A1",
+    collectorName: "Hoàng Thị Linh",
+    collectedAt: "2026-06-22 07:35",
+    location: {
+      lat: 19.9762,
+      lng: 105.6619,
+      address: "Vườn rau số 12, Định Tường, Yên Định",
+    },
+    depth: "0–15 cm",
+    amount: "≈ 800 g",
+    container: "Túi PE kín, dán nhãn QR",
+    preservation: "Nhiệt độ phòng",
+    onSiteReadings: [
+      { name: "pH cầm tay", value: "6.1", unit: "" },
+      { name: "Độ ẩm đất", value: "45", unit: "%" },
+    ],
+    photos: 2,
+    hasSignature: false,
+    status: "Đang thu",
+  },
+  {
+    id: "fs6",
+    fieldCode: "FM-VNNTH-2026-00432",
+    sessionCode: "LM-VNNTH-2026-015",
+    matrix: "Nước tưới kênh Bái Thượng – điểm K12",
+    collectorName: "Nguyễn Quang Anh",
+    collectedAt: "2026-06-12 09:40",
+    location: {
+      lat: 19.9421,
+      lng: 105.5034,
+      address: "Cầu K12 – kênh Bái Thượng, Thọ Xuân",
+    },
+    amount: "1.0 L + 0.5 L (lưu)",
+    container: "Chai PE, axit hóa pH<2",
+    preservation: "Bảo quản lạnh 2-8°C trong thùng đá",
+    onSiteReadings: [
+      { name: "pH", value: "7.4", unit: "" },
+      { name: "EC", value: "0.78", unit: "mS/cm" },
+      { name: "DO", value: "6.2", unit: "mg/L" },
+      { name: "Độ đục", value: "12", unit: "NTU" },
+    ],
+    photos: 3,
+    hasSignature: true,
+    status: "Đã chuyển vào PTN",
+    linkedSampleCode: "M-VNNTH-2026-00432",
+  },
+];
+
 export const dashboardKpis = {
   sampleTotal: samples.length,
   sampleInProgress: samples.filter((s) =>

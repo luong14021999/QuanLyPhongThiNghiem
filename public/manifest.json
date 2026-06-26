@@ -1,0 +1,32 @@
+{
+  "name": "LIMS Viện Nông Nghiệp Thanh Hóa",
+  "short_name": "LIMS VNNTH",
+  "description": "Quản lý phòng thí nghiệm – Lấy mẫu hiện trường offline-first cho cán bộ thực địa",
+  "start_url": "/field",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#1d8048",
+  "lang": "vi",
+  "icons": [
+    {
+      "src": "/icon-leaf.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Lấy mẫu hiện trường",
+      "short_name": "Lấy mẫu",
+      "url": "/field"
+    },
+    {
+      "name": "Bảng điều khiển",
+      "short_name": "Dashboard",
+      "url": "/"
+    }
+  ]
+}
