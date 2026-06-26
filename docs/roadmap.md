@@ -1,6 +1,8 @@
 # Lộ trình triển khai – LIMS Viện Nông Nghiệp Thanh Hóa
 
-> Dựa trên spec "QUẢN LÝ PHÒNG THÍ NGHIỆM" (I. QUẢN LÝ · II. NGHIỆP VỤ · III. THỊ TRƯỜNG) và mục tiêu **ISO/IEC 17025 + tự chủ tài chính**.
+> Dựa trên spec "QUẢN LÝ PHÒNG THÍ NGHIỆM" (I. QUẢN LÝ · II. NGHIỆP VỤ · III. THỊ TRƯỜNG) và mục tiêu **ISO/IEC 17025:2017 + tự chủ tài chính**.
+>
+> **Lưu ý**: ISO/IEC 17025:2005 đã bị thu hồi từ 11/2020 và thay thế bởi ISO/IEC 17025:2017. VILAS (BoA) hiện chỉ công nhận theo 17025:2017. Toàn bộ thiết kế bám theo phiên bản 2017.
 
 ## 1. Đối chiếu spec ↔ module hiện có
 
@@ -12,7 +14,7 @@
 | 2 | Thiết bị | `/equipment` | ✅ Đã có (danh mục + lịch HC/BT + nhật ký SD + môi trường phòng + biên bản KĐ) |
 | 3 | Dụng cụ | `/tools` | ✅ Đã có (danh mục + đặc tính + lịch kiểm định) |
 | 4 | Hóa chất – chất chuẩn – VTTH | `/chemicals` | ✅ Đã có (danh mục + hồ sơ + nhật ký sử dụng) |
-| 5 | Đảm bảo chất lượng KQ | `/qc` | 🟢 P2 – đã làm Levey-Jennings, còn TNTC & SS liên phòng |
+| 5 | Đảm bảo chất lượng KQ | `/qc` · `/risks` · `/decision-rules` | ✅ Levey-Jennings, Westgard, Đăng ký rủi ro (§8.5), Quy tắc quyết định (§7.8.6) |
 | 6 | Kiểm soát tài liệu nội bộ | – | 🟡 P2 – gộp vào "Tài liệu SOP" |
 | 7 | Danh mục báo cáo phê duyệt PP | – | 🟡 P2 – gộp vào "Tài liệu SOP" |
 | 8 | Hướng dẫn quy trình PT | – | 🟡 P2 – gộp vào "Tài liệu SOP" |
@@ -54,7 +56,7 @@
 |---|---|
 | **Tổng quan** | Bảng điều khiển |
 | **Nghiệp vụ** (II) | Tiếp nhận mẫu · Phân tích · Mẫu lưu · Báo cáo KQ |
-| **Đảm bảo chất lượng** (I.5) | Levey-Jennings · Thử nghiệm thành thạo · So sánh liên phòng |
+| **Đảm bảo chất lượng** (I.5 + §7.8.6 + §8.5) | Levey-Jennings · Đăng ký rủi ro · Quy tắc quyết định · TNTC · ILC |
 | **Nguồn lực** (I.1–4) | Nhân sự · Thiết bị · Dụng cụ · Hóa chất |
 | **Tài liệu QL** (I.6–10) | SOP & Phương pháp · Hướng dẫn kiểm định · Biểu mẫu |
 | **Khách hàng & Thị trường** (III + I.11–12) | Khách hàng · Tư vấn · Dịch vụ · Hợp đồng & Báo giá · Khiếu nại · Thăm quan |
@@ -68,7 +70,7 @@
 | Giai đoạn | Trọng tâm | Module |
 |---|---|---|
 | **P1 – MVP** (đã làm) | Vận hành PTN cơ bản | Dashboard · Samples · Analysis · Equipment · Tools · Chemicals · Personnel · Customers · Reports · Settings |
-| **P2 – Chất lượng & Pháp lý** (đang làm) | Đáp ứng đánh giá VILAS / ISO/IEC 17025 | Kho mẫu lưu · QC Levey-Jennings · Tài liệu SOP có versioning · Phân quyền + Audit log · Khiếu nại KH |
+| **P2 – Chất lượng & Pháp lý** (đang làm) | Đáp ứng đánh giá VILAS / ISO/IEC 17025:2017 | ✅ Kho mẫu lưu · ✅ QC Levey-Jennings · ✅ Đăng ký rủi ro (§8.5) · ✅ Quy tắc quyết định (§7.8.6) · 🟡 Tài liệu SOP có versioning · 🟡 Phân quyền + Audit log · 🟡 Khiếu nại KH |
 | **P3 – Tự chủ tài chính** | Tạo doanh thu, theo dõi dòng tiền | Bảng giá · Báo giá · Hợp đồng · Hóa đơn · Công nợ · Cổng tra cứu KH no-login · Thăm quan |
 | **P4 – Thị trường & Tích hợp** | Mở rộng dịch vụ + tự động hóa | Catalog dịch vụ online · Tư vấn pipeline · Tích hợp instrument (CSV/XML import) · Cảnh báo email/Zalo · Đa ngôn ngữ |
 
@@ -91,6 +93,6 @@
 ## 5. Tiến độ chi tiết
 
 - ✅ P1 hoàn thành (10 trang đang chạy)
-- 🟢 P2 đang triển khai: **Mẫu lưu** + **QC Levey-Jennings** (đợt hiện tại)
-- 🟡 P2 còn lại: Tài liệu SOP, Phân quyền + Audit log, Khiếu nại
+- ✅ P2 đã làm: **Mẫu lưu**, **QC Levey-Jennings**, **Đăng ký rủi ro (§8.5)**, **Quy tắc quyết định (§7.8.6)**
+- 🟡 P2 còn lại: Tài liệu SOP có versioning, Phân quyền + Audit log, Khiếu nại KH, Xử lý công việc không phù hợp (§7.10), Đánh giá nội bộ (§8.8) + Xem xét lãnh đạo (§8.9)
 - 🔵 P3, P4 chờ phê duyệt

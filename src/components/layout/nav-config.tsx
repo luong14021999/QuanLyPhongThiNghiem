@@ -13,6 +13,8 @@ import {
   Users2,
   Archive,
   ShieldCheck,
+  AlertOctagon,
+  Scale,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -35,7 +37,11 @@ export const navGroups: NavGroup[] = [
   },
   {
     label: "Đảm bảo chất lượng",
-    items: [{ href: "/qc", label: "QC Levey-Jennings", icon: ShieldCheck }],
+    items: [
+      { href: "/qc", label: "QC Levey-Jennings", icon: ShieldCheck },
+      { href: "/risks", label: "Đăng ký rủi ro", icon: AlertOctagon },
+      { href: "/decision-rules", label: "Quy tắc quyết định", icon: Scale },
+    ],
   },
   {
     label: "Nguồn lực",

@@ -1423,6 +1423,456 @@ export const externalQCRounds: ExternalQCRound[] = [
   },
 ];
 
+export type RiskCategory =
+  | "Khách quan"
+  | "Năng lực nhân sự"
+  | "Thiết bị"
+  | "Phương pháp"
+  | "Cơ sở vật chất"
+  | "Dữ liệu & An ninh"
+  | "Cung ứng"
+  | "Khách hàng & Bên ngoài"
+  | "Quá trình";
+
+export type RiskTreatment =
+  | "Né tránh"
+  | "Giảm thiểu"
+  | "Chuyển giao"
+  | "Chấp nhận";
+
+export type RiskStatus =
+  | "Mở"
+  | "Đang xử lý"
+  | "Đã giảm thiểu"
+  | "Đã đóng";
+
+export type Risk = {
+  id: string;
+  code: string;
+  category: RiskCategory;
+  title: string;
+  cause: string;
+  effect: string;
+  likelihood: 1 | 2 | 3 | 4 | 5;
+  impact: 1 | 2 | 3 | 4 | 5;
+  controls: string;
+  treatment: RiskTreatment;
+  action: string;
+  owner: string;
+  reviewAt: string;
+  residualLikelihood: 1 | 2 | 3 | 4 | 5;
+  residualImpact: 1 | 2 | 3 | 4 | 5;
+  status: RiskStatus;
+  isoClause: string;
+};
+
+export const risks: Risk[] = [
+  {
+    id: "rr1",
+    code: "RR-VNNTH-2026-001",
+    category: "Khách quan",
+    title: "KTV đồng thời nhận tư vấn cho khách hàng gửi mẫu",
+    cause: "KTV có công việc tư vấn cá nhân ngoài giờ – có thể nhận tư vấn cho HTX/DN mà PTN đang phân tích mẫu",
+    effect: "Mất tính khách quan, ảnh hưởng uy tín VILAS, KH khiếu nại",
+    likelihood: 2,
+    impact: 4,
+    controls: "Cam kết khách quan đầu năm; nội quy nội bộ",
+    treatment: "Né tránh",
+    action: "Bổ sung Phiếu khai báo xung đột lợi ích trước mỗi đợt phân tích lớn; Trưởng phòng rà soát hằng quý",
+    owner: "Trưởng phòng PTN",
+    reviewAt: "2026-09-30",
+    residualLikelihood: 1,
+    residualImpact: 4,
+    status: "Đang xử lý",
+    isoClause: "§4.1 Tính khách quan",
+  },
+  {
+    id: "rr2",
+    code: "RR-VNNTH-2026-002",
+    category: "Năng lực nhân sự",
+    title: "KTV mới chưa được ủy quyền vận hành GC-MS độc lập",
+    cause: "Tuyển 2 KTV mới (Phạm Thu Hà thử việc) trong khi nhu cầu phân tích dư lượng BVTV tăng cao",
+    effect: "Kết quả phân tích BVTV có thể không đảm bảo độ tin cậy; quá tải KTV chính",
+    likelihood: 3,
+    impact: 3,
+    controls: "Quy định ủy quyền PP nội bộ; Đào tạo ban đầu 2 tuần",
+    treatment: "Giảm thiểu",
+    action: "Khóa đào tạo QuEChERS + GC-MS Q3/2026; kiểm tra năng lực qua mẫu mù; ủy quyền chính thức sau khi đạt",
+    owner: "Phó phòng QA/QC",
+    reviewAt: "2026-09-15",
+    residualLikelihood: 2,
+    residualImpact: 2,
+    status: "Đang xử lý",
+    isoClause: "§6.2 Nhân sự",
+  },
+  {
+    id: "rr3",
+    code: "RR-VNNTH-2026-003",
+    category: "Cơ sở vật chất",
+    title: "Mất điện đột ngột làm mất dữ liệu raw từ ICP-MS / GC-MS",
+    cause: "Lưới điện địa phương không ổn định mùa mưa bão; máy chạy mẻ kéo dài 2-4 giờ",
+    effect: "Mất dữ liệu raw không phục hồi được; phải lặp lại mẻ; chi phí chuẩn cao",
+    likelihood: 3,
+    impact: 5,
+    controls: "UPS 10 kVA cho phòng dụng cụ; máy phát dự phòng",
+    treatment: "Giảm thiểu",
+    action: "Auto-save raw 5 phút/lần; backup cloud trong 24h; chuyển dữ liệu sau mỗi mẻ về NAS",
+    owner: "Quản trị hệ thống",
+    reviewAt: "2026-07-31",
+    residualLikelihood: 2,
+    residualImpact: 2,
+    status: "Đã giảm thiểu",
+    isoClause: "§6.3 + §7.5",
+  },
+  {
+    id: "rr4",
+    code: "RR-VNNTH-2026-004",
+    category: "Phương pháp",
+    title: "Phương pháp QuEChERS chưa thẩm định cho matrix cam (quả mọng)",
+    cause: "Mở rộng dịch vụ phân tích cam Vân Du, lê, mít – matrix chứa nhiều đường gây nhiễu khi chiết",
+    effect: "Kết quả BVTV trên quả mọng có thể bị thiên lệch; rủi ro pháp lý cho phiếu KQ",
+    likelihood: 3,
+    impact: 4,
+    controls: "Đối chiếu PP gốc AOAC; chạy mẫu chuẩn thêm",
+    treatment: "Giảm thiểu",
+    action: "Thẩm định nội bộ matrix cam/lê/mít trước 2026-09: spike recovery 70–120%, RSD < 20%; báo cáo phê duyệt",
+    owner: "Phó phòng QA/QC",
+    reviewAt: "2026-09-30",
+    residualLikelihood: 2,
+    residualImpact: 3,
+    status: "Mở",
+    isoClause: "§7.2.2 Lựa chọn & thẩm định PP",
+  },
+  {
+    id: "rr5",
+    code: "RR-VNNTH-2026-005",
+    category: "Thiết bị",
+    title: "Tủ chuẩn lạnh dao động nhiệt 5–9°C",
+    cause: "Cảm biến cũ (>5 năm); rò rỉ joint; dao động khi mở thường xuyên",
+    effect: "Chuẩn BVTV nhạy có thể phân hủy; chuẩn không đảm bảo độ ổn định",
+    likelihood: 4,
+    impact: 3,
+    controls: "Ghi nhiệt độ 3 lần/ngày (đã tự động ở /equipment)",
+    treatment: "Giảm thiểu",
+    action: "Thay cảm biến + joint Q3/2026; cảnh báo tự động khi ngoài 2–8°C; mua tủ dự phòng",
+    owner: "Phụ trách thiết bị",
+    reviewAt: "2026-08-31",
+    residualLikelihood: 2,
+    residualImpact: 3,
+    status: "Đang xử lý",
+    isoClause: "§6.4.4 Kiểm soát thiết bị",
+  },
+  {
+    id: "rr6",
+    code: "RR-VNNTH-2026-006",
+    category: "Cung ứng",
+    title: "NCC chuẩn BVTV (Sigma) tăng leadtime từ 2 → 8 tuần",
+    cause: "Hạn chế nhập khẩu chất chuẩn; chỉ có 1 NCC chính",
+    effect: "Có thể đứt nguồn chuẩn BVTV trong Q3/2026; gián đoạn QC",
+    likelihood: 3,
+    impact: 4,
+    controls: "Theo dõi tồn kho HC-0703; đặt hàng định kỳ",
+    treatment: "Chuyển giao",
+    action: "Bổ sung 2 NCC backup (LGC Standards, AccuStandard); duy trì tồn ≥ 20% MOQ; lập hợp đồng khung",
+    owner: "Phòng vật tư",
+    reviewAt: "2026-08-15",
+    residualLikelihood: 2,
+    residualImpact: 3,
+    status: "Mở",
+    isoClause: "§6.6 Sản phẩm/Dịch vụ bên ngoài",
+  },
+  {
+    id: "rr7",
+    code: "RR-VNNTH-2026-007",
+    category: "Quá trình",
+    title: "Mẫu lưu hết hạn không kịp phân tích QC 3 tháng/lần",
+    cause: "Khối lượng mẫu tăng, KTV bỏ sót lịch QC mẫu lưu",
+    effect: "Không có dữ liệu kiểm soát chéo theo thời gian; vi phạm §7.7.1",
+    likelihood: 2,
+    impact: 3,
+    controls: "Lịch tự sinh trong /archive; gán KTV phụ trách",
+    treatment: "Giảm thiểu",
+    action: "Cảnh báo 30 ngày + 7 ngày qua email; tự gán KTV theo nhóm chuyên môn (đã làm /archive)",
+    owner: "Trưởng nhóm Đảm bảo chất lượng",
+    reviewAt: "2026-09-30",
+    residualLikelihood: 1,
+    residualImpact: 2,
+    status: "Đã giảm thiểu",
+    isoClause: "§7.4.4 Mẫu lưu",
+  },
+  {
+    id: "rr8",
+    code: "RR-VNNTH-2026-008",
+    category: "Khách hàng & Bên ngoài",
+    title: "KH khiếu nại chậm trả KQ phân tích",
+    cause: "Mùa cao điểm (quý 2, quý 4) khối lượng mẫu tăng 40%; thiếu KTV BVTV",
+    effect: "Mất uy tín với HTX/DN; ảnh hưởng tự chủ tài chính",
+    likelihood: 3,
+    impact: 3,
+    controls: "Cam kết SLA 5–7 ngày làm việc; nhắc nhở khi gần hạn",
+    treatment: "Giảm thiểu",
+    action: "Triển khai KPI SLA per chỉ tiêu; cảnh báo trước hạn 3 ngày; mua thêm máy GC-MS thứ 2 trong 2027",
+    owner: "Trưởng phòng PTN",
+    reviewAt: "2026-12-31",
+    residualLikelihood: 2,
+    residualImpact: 2,
+    status: "Đang xử lý",
+    isoClause: "§7.9 Khiếu nại",
+  },
+  {
+    id: "rr9",
+    code: "RR-VNNTH-2026-009",
+    category: "Dữ liệu & An ninh",
+    title: "Truy cập trái phép vào dữ liệu kết quả",
+    cause: "Hệ thống LIMS chưa triển khai phân quyền RBAC; nhân viên dùng chung tài khoản",
+    effect: "Rò rỉ thông tin KH; sửa kết quả trái phép; mất uy tín VILAS",
+    likelihood: 2,
+    impact: 5,
+    controls: "Mật khẩu BIOS máy chủ; phòng chứa máy chủ khóa",
+    treatment: "Giảm thiểu",
+    action: "Triển khai RBAC + 2FA cho Trưởng phòng/QA-QC + audit log toàn hệ thống (kế hoạch P2)",
+    owner: "Quản trị hệ thống",
+    reviewAt: "2026-12-31",
+    residualLikelihood: 1,
+    residualImpact: 4,
+    status: "Mở",
+    isoClause: "§7.11 Kiểm soát dữ liệu",
+  },
+  {
+    id: "rr10",
+    code: "RR-VNNTH-2026-010",
+    category: "Quá trình",
+    title: "Sai sót khi nhập tay kết quả từ ICP-MS / GC-MS",
+    cause: "KTV phải gõ tay kết quả từ phần mềm máy vào hệ thống LIMS",
+    effect: "Sai số nhập tay 0.5–2%; kết quả không khớp dữ liệu raw",
+    likelihood: 4,
+    impact: 3,
+    controls: "QA/QC kiểm tra chéo; đối chiếu với raw file",
+    treatment: "Giảm thiểu",
+    action: "Tích hợp import CSV/XML trực tiếp từ phần mềm instrument vào LIMS (kế hoạch P4)",
+    owner: "Quản trị hệ thống",
+    reviewAt: "2027-03-31",
+    residualLikelihood: 2,
+    residualImpact: 2,
+    status: "Mở",
+    isoClause: "§7.5 Hồ sơ kỹ thuật",
+  },
+];
+
+export type Opportunity = {
+  id: string;
+  title: string;
+  description: string;
+  expectedBenefit: string;
+  owner: string;
+  status: "Đề xuất" | "Đang triển khai" | "Đã đạt";
+};
+
+export const opportunities: Opportunity[] = [
+  {
+    id: "op1",
+    title: "Nâng cấp GC-MS/MS thay cho GC-MS đơn",
+    description:
+      "Đầu tư GC-MS/MS để hạ giới hạn phát hiện (LOQ) BVTV xuống mức MRL EU – mở rộng dịch vụ phân tích nông sản xuất khẩu",
+    expectedBenefit:
+      "Tiếp cận thị trường nông sản xuất khẩu EU/Nhật; tăng doanh thu ~30% nhóm BVTV",
+    owner: "Ban Giám đốc PTN",
+    status: "Đề xuất",
+  },
+  {
+    id: "op2",
+    title: "Mở rộng phạm vi VILAS thêm dư lượng kháng sinh trong sữa & mật ong",
+    description:
+      "Đăng ký mở rộng phạm vi công nhận thêm 4 nhóm kháng sinh; tận dụng HPLC sẵn có",
+    expectedBenefit:
+      "Thêm dịch vụ mới; phục vụ HTX nuôi ong + trang trại sữa Thanh Hóa",
+    owner: "Phó phòng QA/QC",
+    status: "Đang triển khai",
+  },
+  {
+    id: "op3",
+    title: "Tích hợp instrument – LIMS",
+    description:
+      "Tự động lấy dữ liệu raw từ ICP-MS, GC-MS, HPLC vào LIMS qua CSV/XML watcher",
+    expectedBenefit:
+      "Giảm sai sót nhập tay > 95%; rút ngắn 1 ngày/mẫu chu trình trả KQ",
+    owner: "Quản trị hệ thống",
+    status: "Đề xuất",
+  },
+];
+
+export type DecisionRuleType =
+  | "Simple acceptance (không guard band)"
+  | "Guarded acceptance (w = U)"
+  | "Guarded rejection (w = U)"
+  | "Theo thỏa thuận khách hàng";
+
+export type DecisionRule = {
+  id: string;
+  criterion: string;
+  matrix: string;
+  method: string;
+  unit: string;
+  limit: number;
+  limitDirection: "max" | "min" | "range";
+  limitMin?: number;
+  limitSource: string;
+  uncertainty: number;
+  ruleType: DecisionRuleType;
+  acceptanceUpper?: number;
+  rejectionUpper?: number;
+  acceptanceLower?: number;
+  rejectionLower?: number;
+  notes: string;
+  approvedBy: string;
+  approvedAt: string;
+};
+
+export const decisionRules: DecisionRule[] = [
+  {
+    id: "dr1",
+    criterion: "Pb tổng",
+    matrix: "Rau lá (cải, xà lách)",
+    method: "ICP-MS – TCVN 7929:2008",
+    unit: "mg/kg",
+    limit: 0.3,
+    limitDirection: "max",
+    limitSource: "QCVN 8-2:2011/BYT – KLN trong thực phẩm",
+    uncertainty: 0.04,
+    ruleType: "Guarded acceptance (w = U)",
+    acceptanceUpper: 0.26,
+    rejectionUpper: 0.34,
+    notes:
+      "Chấp nhận khi kết quả ≤ 0.26 mg/kg (≤ MRL − U); Từ chối khi > 0.34. Vùng giữa lập biên bản, có thể yêu cầu phân tích lại.",
+    approvedBy: "TS. Nguyễn Đình Lương",
+    approvedAt: "2026-01-15",
+  },
+  {
+    id: "dr2",
+    criterion: "Cd tổng",
+    matrix: "Quả tươi (cam, lê)",
+    method: "ICP-MS – TCVN 7929:2008",
+    unit: "mg/kg",
+    limit: 0.05,
+    limitDirection: "max",
+    limitSource: "QCVN 8-2:2011/BYT",
+    uncertainty: 0.007,
+    ruleType: "Guarded acceptance (w = U)",
+    acceptanceUpper: 0.043,
+    rejectionUpper: 0.057,
+    notes:
+      "Áp dụng JCGM 106:2012, k=2. Mức bảo vệ KH ưu tiên (KH thực phẩm xuất khẩu).",
+    approvedBy: "TS. Nguyễn Đình Lương",
+    approvedAt: "2026-01-15",
+  },
+  {
+    id: "dr3",
+    criterion: "Chlorpyrifos (dư lượng BVTV)",
+    matrix: "Rau lá",
+    method: "GC-MS QuEChERS – AOAC 2007.01",
+    unit: "mg/kg",
+    limit: 0.05,
+    limitDirection: "max",
+    limitSource: "Codex MRL CXL 17-2018 (rau lá)",
+    uncertainty: 0.008,
+    ruleType: "Guarded acceptance (w = U)",
+    acceptanceUpper: 0.042,
+    rejectionUpper: 0.058,
+    notes:
+      "Codex MRL nghiêm ngặt hơn QCVN cho rau lá. Khi KH yêu cầu chuẩn EU, áp giá trị 0.01 mg/kg theo thỏa thuận riêng.",
+    approvedBy: "ThS. Trần Thị Mai",
+    approvedAt: "2026-02-10",
+  },
+  {
+    id: "dr4",
+    criterion: "As tổng",
+    matrix: "Nước tưới nông nghiệp",
+    method: "AAS – SMEWW 3114B",
+    unit: "mg/L",
+    limit: 0.05,
+    limitDirection: "max",
+    limitSource: "QCVN 39:2011/BTNMT – Nước tưới tiêu",
+    uncertainty: 0.005,
+    ruleType: "Guarded acceptance (w = U)",
+    acceptanceUpper: 0.045,
+    rejectionUpper: 0.055,
+    notes:
+      "Sử dụng hydride generation cho mẫu nước; chuyển ICP-MS khi LOQ không đạt.",
+    approvedBy: "TS. Nguyễn Đình Lương",
+    approvedAt: "2026-01-15",
+  },
+  {
+    id: "dr5",
+    criterion: "pHKCl",
+    matrix: "Đất canh tác",
+    method: "Điện cực thủy tinh – TCVN 5979:2007",
+    unit: "đơn vị pH",
+    limit: 7.5,
+    limitDirection: "range",
+    limitMin: 4.5,
+    limitSource: "TCVN 7373:2004 – Đất canh tác",
+    uncertainty: 0.05,
+    ruleType: "Simple acceptance (không guard band)",
+    notes:
+      "Trả kết quả số có ±U; KH/đơn vị tư vấn dùng để khuyến cáo bón vôi/phân, không kết luận đạt/không đạt.",
+    approvedBy: "TS. Nguyễn Đình Lương",
+    approvedAt: "2026-01-15",
+  },
+  {
+    id: "dr6",
+    criterion: "P₂O₅ hữu hiệu",
+    matrix: "Phân bón NPK 16-16-8",
+    method: "Quang phổ Mo-vanadat – TCVN 8559:2010",
+    unit: "%",
+    limit: 16.5,
+    limitDirection: "range",
+    limitMin: 15.5,
+    limitSource: "NĐ 84/2019/NĐ-CP – Quản lý phân bón (dung sai ±0.5%)",
+    uncertainty: 0.32,
+    ruleType: "Guarded acceptance (w = U)",
+    acceptanceUpper: 16.18,
+    acceptanceLower: 15.82,
+    notes:
+      "Quy tắc 2 phía. Phân bón ngoài khoảng (15.82 – 16.18) % bị đánh giá Không đạt theo Nghị định 84.",
+    approvedBy: "TS. Nguyễn Đình Lương",
+    approvedAt: "2026-03-12",
+  },
+  {
+    id: "dr7",
+    criterion: "Tổng Coliform",
+    matrix: "Nước tưới",
+    method: "Lọc màng – TCVN 6187-1:2009",
+    unit: "CFU/100 mL",
+    limit: 200,
+    limitDirection: "max",
+    limitSource: "QCVN 39:2011/BTNMT",
+    uncertainty: 0,
+    ruleType: "Theo thỏa thuận khách hàng",
+    notes:
+      "Chỉ tiêu vi sinh có phân bố Poisson – không áp dụng guard band thông thường. Quy tắc theo thỏa thuận: KH có thể chọn ngưỡng quyết định 100 CFU/100 mL hoặc giữ nguyên QCVN.",
+    approvedBy: "ThS. Trần Thị Mai",
+    approvedAt: "2026-02-20",
+  },
+  {
+    id: "dr8",
+    criterion: "Nitrat (NO₃⁻)",
+    matrix: "Rau lá",
+    method: "HPLC – TCVN 8742:2011",
+    unit: "mg/kg",
+    limit: 500,
+    limitDirection: "max",
+    limitSource: "EC 1881/2006 – áp dụng tham chiếu cho rau xuất khẩu",
+    uncertainty: 20,
+    ruleType: "Guarded acceptance (w = U)",
+    acceptanceUpper: 480,
+    rejectionUpper: 520,
+    notes:
+      "Áp dụng cho KH có hợp đồng xuất khẩu EU. KH nội địa có thể chọn Simple acceptance qua thỏa thuận.",
+    approvedBy: "ThS. Trần Thị Mai",
+    approvedAt: "2026-02-10",
+  },
+];
+
 export const dashboardKpis = {
   sampleTotal: samples.length,
   sampleInProgress: samples.filter((s) =>
