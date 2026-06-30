@@ -246,8 +246,9 @@ type CampaignRow = {
   created_at: string;
 };
 
-type GenericInsert<T> = Omit<T, "id" | "created_at" | "updated_at"> &
-  Partial<Pick<T, "id">>;
+type GenericInsert<T> = Omit<T, "id" | "created_at" | "updated_at"> & {
+  id?: string;
+};
 type GenericUpdate<T> = Partial<T>;
 
 export type Database = {
