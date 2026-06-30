@@ -1,8 +1,6 @@
 import {
   Users2,
-  UserPlus,
   Filter,
-  Search,
   Building2,
   Sprout,
   Landmark,
@@ -10,6 +8,8 @@ import {
   Phone,
   MapPin,
   Download,
+  HardDrive,
+  Database as DatabaseIcon,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Header } from "@/components/layout/header";
@@ -31,7 +31,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { customers, type CustomerKind } from "@/lib/mock-data";
+import { type CustomerKind } from "@/lib/mock-data";
+import { getCustomers } from "@/lib/data/customers";
+import { AddCustomerDialog } from "@/components/customers/add-customer-dialog";
+import { DeleteCustomerButton } from "@/components/customers/delete-customer-button";
+import { CustomerSearchInput } from "@/components/customers/search-input";
+
+export const dynamic = "force-dynamic";
 
 const kindIcon: Record<CustomerKind, LucideIcon> = {
   "Doanh nghiệp": Building2,
@@ -52,46 +58,63 @@ const kindVariant: Record<
   "Viện / Trường": "outline",
 };
 
-const totalSamples = customers.reduce((sum, c) => sum + c.samplesYTD, 0);
-const kindCounts = customers.reduce<Record<CustomerKind, number>>(
-  (acc, c) => {
-    acc[c.kind] = (acc[c.kind] || 0) + 1;
-    return acc;
-  },
-  {} as Record<CustomerKind, number>,
-);
-const topCustomers = [...customers]
-  .sort((a, b) => b.samplesYTD - a.samplesYTD)
-  .slice(0, 5);
+export default async function CustomersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q = "" } = await searchParams;
+  const all = await getCustomers();
+  const query = q.trim().toLowerCase();
+  const customers = query
+    ? all.filter(
+        (c) =>
+          c.name.toLowerCase().includes(query) ||
+          c.code.toLowerCase().includes(query) ||
+          c.contact.toLowerCase().includes(query) ||
+          c.address.toLowerCase().includes(query),
+      )
+    : all;
 
-const stats = [
-  {
-    label: "Tổng khách hàng",
-    value: customers.length,
-    icon: Users2,
-    accent: "bg-emerald-50 text-emerald-700",
-  },
-  {
-    label: "Mẫu YTD đã tiếp nhận",
-    value: totalSamples,
-    icon: Sprout,
-    accent: "bg-blue-50 text-blue-600",
-  },
-  {
-    label: "HTX / Trang trại",
-    value: customers.filter((c) => c.kind === "HTX / Trang trại").length,
-    icon: Building2,
-    accent: "bg-violet-50 text-violet-600",
-  },
-  {
-    label: "Cơ quan nhà nước",
-    value: customers.filter((c) => c.kind === "Cơ quan nhà nước").length,
-    icon: Landmark,
-    accent: "bg-amber-50 text-amber-600",
-  },
-];
+  const totalSamples = all.reduce((sum, c) => sum + c.samplesYTD, 0);
+  const kindCounts = all.reduce<Record<CustomerKind, number>>(
+    (acc, c) => {
+      acc[c.kind] = (acc[c.kind] || 0) + 1;
+      return acc;
+    },
+    {} as Record<CustomerKind, number>,
+  );
+  const topCustomers = [...all]
+    .sort((a, b) => b.samplesYTD - a.samplesYTD)
+    .slice(0, 5);
 
-export default function CustomersPage() {
+  const stats = [
+    {
+      label: "Tổng khách hàng",
+      value: all.length,
+      icon: Users2,
+      accent: "bg-emerald-50 text-emerald-700",
+    },
+    {
+      label: "Mẫu YTD đã tiếp nhận",
+      value: totalSamples,
+      icon: Sprout,
+      accent: "bg-blue-50 text-blue-600",
+    },
+    {
+      label: "HTX / Trang trại",
+      value: all.filter((c) => c.kind === "HTX / Trang trại").length,
+      icon: Building2,
+      accent: "bg-violet-50 text-violet-600",
+    },
+    {
+      label: "Cơ quan nhà nước",
+      value: all.filter((c) => c.kind === "Cơ quan nhà nước").length,
+      icon: Landmark,
+      accent: "bg-amber-50 text-amber-600",
+    },
+  ];
+
   return (
     <>
       <Header
@@ -99,6 +122,28 @@ export default function CustomersPage() {
         description="Tổ chức, hợp tác xã, nông hộ và cơ quan gửi mẫu phân tích về Viện"
       />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 scrollbar-thin">
+        <div className="flex flex-wrap items-center gap-2">
+          {all[0]?.source === "supabase" ? (
+            <Badge variant="success">
+              <DatabaseIcon className="w-3 h-3" />
+              Dữ liệu live từ Supabase
+            </Badge>
+          ) : (
+            <Badge variant="default">
+              <HardDrive className="w-3 h-3" />
+              Dữ liệu lưu trong{" "}
+              <code className="font-mono ml-1">data/customers.json</code>
+            </Badge>
+          )}
+          <span className="text-xs text-muted-foreground">
+            {customers.length}
+            {query && all.length !== customers.length
+              ? ` / ${all.length}`
+              : ""}{" "}
+            khách hàng
+          </span>
+        </div>
+
         <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((s) => (
             <Card key={s.label}>
@@ -128,13 +173,7 @@ export default function CustomersPage() {
               </CardDescription>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-2 rounded-md border border-input bg-background px-2.5 h-9 text-sm w-full sm:w-56">
-                <Search className="w-4 h-4 text-muted-foreground" />
-                <input
-                  className="bg-transparent outline-none flex-1"
-                  placeholder="Tìm tên, mã, địa chỉ..."
-                />
-              </div>
+              <CustomerSearchInput />
               <Button variant="outline" size="sm">
                 <Filter />
                 Lọc
@@ -143,10 +182,7 @@ export default function CustomersPage() {
                 <Download />
                 Xuất Excel
               </Button>
-              <Button size="sm">
-                <UserPlus />
-                Thêm khách hàng
-              </Button>
+              <AddCustomerDialog />
             </div>
           </CardHeader>
           <CardContent>
@@ -169,6 +205,7 @@ export default function CustomersPage() {
                     <TableHead>Địa chỉ</TableHead>
                     <TableHead className="text-right">Mẫu YTD</TableHead>
                     <TableHead>Mẫu gần nhất</TableHead>
+                    <TableHead className="w-[60px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -188,7 +225,7 @@ export default function CustomersPage() {
                         </TableCell>
                         <TableCell>
                           <Badge variant={kindVariant[c.kind]}>
-                            <Icon className="w-3 h-3" />
+                            {Icon && <Icon className="w-3 h-3" />}
                             {c.kind}
                           </Badge>
                         </TableCell>
@@ -205,9 +242,24 @@ export default function CustomersPage() {
                         <TableCell className="text-xs text-muted-foreground">
                           {c.lastSampleAt}
                         </TableCell>
+                        <TableCell>
+                          <DeleteCustomerButton id={c.id} name={c.name} />
+                        </TableCell>
                       </TableRow>
                     );
                   })}
+                  {customers.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={8}
+                        className="text-center text-sm text-muted-foreground py-8"
+                      >
+                        {query
+                          ? `Không có KH nào khớp "${query}"`
+                          : "Chưa có khách hàng nào"}
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </div>
@@ -225,7 +277,10 @@ export default function CustomersPage() {
             <CardContent>
               <ul className="space-y-3">
                 {topCustomers.map((c, idx) => {
-                  const pct = Math.round((c.samplesYTD / totalSamples) * 100);
+                  const pct =
+                    totalSamples > 0
+                      ? Math.round((c.samplesYTD / totalSamples) * 100)
+                      : 0;
                   return (
                     <li
                       key={c.id}
@@ -265,13 +320,18 @@ export default function CustomersPage() {
             <CardContent className="space-y-4">
               {(Object.keys(kindCounts) as CustomerKind[]).map((k) => {
                 const count = kindCounts[k];
-                const pct = Math.round((count / customers.length) * 100);
+                const pct =
+                  customers.length > 0
+                    ? Math.round((count / customers.length) * 100)
+                    : 0;
                 const Icon = kindIcon[k];
                 return (
                   <div key={k}>
                     <div className="flex items-center justify-between text-sm mb-1.5">
                       <span className="flex items-center gap-2 truncate pr-2">
-                        <Icon className="w-3.5 h-3.5 text-muted-foreground" />
+                        {Icon && (
+                          <Icon className="w-3.5 h-3.5 text-muted-foreground" />
+                        )}
                         {k}
                       </span>
                       <span className="text-muted-foreground text-xs">

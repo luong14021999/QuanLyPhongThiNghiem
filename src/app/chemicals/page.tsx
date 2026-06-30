@@ -5,7 +5,6 @@ import {
   PackageMinus,
   CalendarOff,
   Filter,
-  Search,
   ShieldAlert,
   FileText,
   FlaskRound,
@@ -31,14 +30,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { chemicals, chemicalUsageLogs } from "@/lib/mock-data";
+import { chemicalUsageLogs, type Chemical } from "@/lib/mock-data";
+import { chemicalsStore } from "@/lib/data/chemicals";
+import { AddChemicalDialog } from "@/components/chemicals/add-chemical-dialog";
+import { DeleteEntityButton } from "@/components/crud/delete-button";
+import { EntitySearchInput } from "@/components/crud/search-input";
 
-const hazardVariant = {
+export const dynamic = "force-dynamic";
+
+const hazardVariant: Record<
+  Chemical["hazard"],
+  "secondary" | "destructive" | "warning"
+> = {
   Thường: "secondary",
   "Độc hại": "destructive",
   "Dễ cháy": "warning",
   "Ăn mòn": "warning",
-} as const;
+};
 
 function daysUntil(dateStr: string) {
   const diff =
@@ -47,36 +55,53 @@ function daysUntil(dateStr: string) {
   return Math.round(diff);
 }
 
-const stats = [
-  {
-    label: "Mặt hàng đang quản lý",
-    value: chemicals.length,
-    icon: Beaker,
-    accent: "bg-blue-50 text-blue-600",
-  },
-  {
-    label: "Sắp hết hạn (≤ 120 ngày)",
-    value: chemicals.filter((c) => daysUntil(c.expiry) <= 120).length,
-    icon: CalendarOff,
-    accent: "bg-amber-50 text-amber-600",
-  },
-  {
-    label: "Tồn dưới mức tối thiểu",
-    value: chemicals.filter((c) => c.stock < c.minStock).length,
-    icon: AlertTriangle,
-    accent: "bg-rose-50 text-rose-600",
-  },
-  {
-    label: "Hóa chất nguy hiểm",
-    value: chemicals.filter((c) =>
-      ["Độc hại", "Dễ cháy", "Ăn mòn"].includes(c.hazard),
-    ).length,
-    icon: ShieldAlert,
-    accent: "bg-violet-50 text-violet-600",
-  },
-];
+export default async function ChemicalsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q = "" } = await searchParams;
+  const all = await chemicalsStore.list();
+  const query = q.trim().toLowerCase();
+  const chemicals = query
+    ? all.filter(
+        (c) =>
+          c.code.toLowerCase().includes(query) ||
+          c.name.toLowerCase().includes(query) ||
+          c.cas.toLowerCase().includes(query) ||
+          c.location.toLowerCase().includes(query),
+      )
+    : all;
 
-export default function ChemicalsPage() {
+  const stats = [
+    {
+      label: "Mặt hàng đang quản lý",
+      value: all.length,
+      icon: Beaker,
+      accent: "bg-blue-50 text-blue-600",
+    },
+    {
+      label: "Sắp hết hạn (≤ 120 ngày)",
+      value: all.filter((c) => daysUntil(c.expiry) <= 120).length,
+      icon: CalendarOff,
+      accent: "bg-amber-50 text-amber-600",
+    },
+    {
+      label: "Tồn dưới mức tối thiểu",
+      value: all.filter((c) => c.stock < c.minStock).length,
+      icon: AlertTriangle,
+      accent: "bg-rose-50 text-rose-600",
+    },
+    {
+      label: "Hóa chất nguy hiểm",
+      value: all.filter((c) =>
+        ["Độc hại", "Dễ cháy", "Ăn mòn"].includes(c.hazard),
+      ).length,
+      icon: ShieldAlert,
+      accent: "bg-violet-50 text-violet-600",
+    },
+  ];
+
   return (
     <>
       <Header
@@ -113,13 +138,10 @@ export default function ChemicalsPage() {
               </CardDescription>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-2 rounded-md border border-input bg-background px-2.5 h-9 text-sm w-full sm:w-56">
-                <Search className="w-4 h-4 text-muted-foreground" />
-                <input
-                  className="bg-transparent outline-none flex-1"
-                  placeholder="Tìm theo tên, CAS..."
-                />
-              </div>
+              <EntitySearchInput
+                basePath="/chemicals"
+                placeholder="Tìm theo tên, CAS..."
+              />
               <Button variant="outline" size="sm">
                 <Filter />
                 Lọc
@@ -128,10 +150,11 @@ export default function ChemicalsPage() {
                 <PackageMinus />
                 Xuất kho
               </Button>
-              <Button size="sm">
+              <Button variant="outline" size="sm">
                 <PackagePlus />
                 Nhập kho
               </Button>
+              <AddChemicalDialog />
             </div>
           </CardHeader>
           <CardContent>
@@ -147,9 +170,22 @@ export default function ChemicalsPage() {
                     <TableHead>Hạn dùng</TableHead>
                     <TableHead>Vị trí</TableHead>
                     <TableHead>Phân loại</TableHead>
+                    <TableHead className="w-[60px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
+                  {chemicals.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={9}
+                        className="text-center text-sm text-muted-foreground py-8"
+                      >
+                        {query
+                          ? `Không có hóa chất nào khớp "${query}"`
+                          : "Chưa có hóa chất nào"}
+                      </TableCell>
+                    </TableRow>
+                  )}
                   {chemicals.map((c) => {
                     const lowStock = c.stock < c.minStock;
                     const expDays = daysUntil(c.expiry);
@@ -207,6 +243,13 @@ export default function ChemicalsPage() {
                           <Badge variant={hazardVariant[c.hazard]}>
                             {c.hazard}
                           </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <DeleteEntityButton
+                            entity="chemicals"
+                            id={c.id}
+                            label={c.name}
+                          />
                         </TableCell>
                       </TableRow>
                     );

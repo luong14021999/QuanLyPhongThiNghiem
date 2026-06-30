@@ -19,6 +19,8 @@ import {
   FileSignature,
   Telescope,
   ClipboardEdit,
+  MessageSquare,
+  Briefcase,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -61,8 +63,12 @@ export const navGroups: NavGroup[] = [
     ],
   },
   {
-    label: "Khách hàng",
-    items: [{ href: "/customers", label: "Khách hàng", icon: Users2 }],
+    label: "Khách hàng & Thị trường",
+    items: [
+      { href: "/customers", label: "Khách hàng", icon: Users2 },
+      { href: "/services", label: "Dịch vụ & Tư vấn", icon: Briefcase },
+      { href: "/feedback", label: "Ý kiến & Khiếu nại", icon: MessageSquare },
+    ],
   },
   {
     label: "Khác",

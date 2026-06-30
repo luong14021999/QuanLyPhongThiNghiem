@@ -59,28 +59,54 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle>Định dạng mã mẫu</CardTitle>
               <CardDescription>
-                Tự động sinh mã khi tạo phiếu tiếp nhận
+                Tự động sinh mã khi tạo phiếu tiếp nhận – theo quy định Viện
+                (spec mục I.1)
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="prefix">Tiền tố</Label>
-                <Input id="prefix" defaultValue="M" />
-              </div>
-              <div className="space-y-1.5">
                 <Label htmlFor="pattern">Mẫu mã</Label>
                 <Input
                   id="pattern"
-                  defaultValue="{prefix}-VNNTH-{YYYY}-{seq:5}"
+                  defaultValue="{YY}{MM}{DD}-{phieuSeq:2}/{sampleSeq}"
                   className="font-mono"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Ví dụ: M-VNNTH-2026-00322
+                  Ví dụ: <span className="font-mono">260626-12/3</span> →
+                  ngày 26/06/26, phiếu thứ 12 trong tháng, mẫu thứ 3 của phiếu
                 </p>
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="next">Số tiếp theo</Label>
-                <Input id="next" type="number" defaultValue={322} />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="phieuSeq">Số phiếu kế tiếp (tháng này)</Label>
+                  <Input id="phieuSeq" type="number" defaultValue={13} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="sampleSeq">Số mẫu kế tiếp trong phiếu</Label>
+                  <Input id="sampleSeq" type="number" defaultValue={1} />
+                </div>
+              </div>
+              <div className="rounded-md bg-muted/40 p-3 text-xs space-y-1">
+                <div className="font-semibold uppercase text-muted-foreground">
+                  Giải thích token
+                </div>
+                <div>
+                  <span className="font-mono">YY</span> · 2 số cuối của năm (26)
+                </div>
+                <div>
+                  <span className="font-mono">MM</span> · tháng (06)
+                </div>
+                <div>
+                  <span className="font-mono">DD</span> · ngày trong tháng (26)
+                </div>
+                <div>
+                  <span className="font-mono">phieuSeq:2</span> · số thứ tự
+                  phiếu trong tháng (XX)
+                </div>
+                <div>
+                  <span className="font-mono">sampleSeq</span> · số thứ tự mẫu
+                  trong phiếu (Y)
+                </div>
               </div>
               <div className="flex justify-end">
                 <Button>Lưu</Button>

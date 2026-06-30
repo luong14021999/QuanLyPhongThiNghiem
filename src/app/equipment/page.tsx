@@ -3,9 +3,7 @@ import {
   CalendarClock,
   AlertTriangle,
   CheckCircle2,
-  Plus,
   Filter,
-  Search,
   ScrollText,
   Thermometer,
   Droplets,
@@ -30,18 +28,28 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  equipments,
   maintenanceSchedule,
   equipmentUsageLogs,
   environmentReadings,
 } from "@/lib/mock-data";
+import { equipmentStore } from "@/lib/data/equipment";
+import { AddEquipmentDialog } from "@/components/equipment/add-equipment-dialog";
+import { DeleteEntityButton } from "@/components/crud/delete-button";
+import { EntitySearchInput } from "@/components/crud/search-input";
 
-const statusVariant = {
+export const dynamic = "force-dynamic";
+
+type EquipmentStatus = "Hoạt động" | "Hiệu chuẩn" | "Bảo trì" | "Ngừng";
+
+const statusVariant: Record<
+  EquipmentStatus,
+  "success" | "warning" | "secondary" | "destructive"
+> = {
   "Hoạt động": "success",
   "Hiệu chuẩn": "warning",
   "Bảo trì": "secondary",
   Ngừng: "destructive",
-} as const;
+};
 
 function daysUntil(dateStr: string) {
   const diff =
@@ -50,36 +58,53 @@ function daysUntil(dateStr: string) {
   return Math.round(diff);
 }
 
-const stats = [
-  {
-    label: "Thiết bị đang hoạt động",
-    value: equipments.filter((e) => e.status === "Hoạt động").length,
-    icon: CheckCircle2,
-    accent: "bg-emerald-50 text-emerald-600",
-  },
-  {
-    label: "Đang hiệu chuẩn / bảo trì",
-    value: equipments.filter((e) =>
-      ["Hiệu chuẩn", "Bảo trì"].includes(e.status),
-    ).length,
-    icon: Wrench,
-    accent: "bg-amber-50 text-amber-600",
-  },
-  {
-    label: "Sắp đến hạn hiệu chuẩn",
-    value: equipments.filter((e) => daysUntil(e.nextCalibration) <= 60).length,
-    icon: CalendarClock,
-    accent: "bg-blue-50 text-blue-600",
-  },
-  {
-    label: "Cảnh báo quá hạn",
-    value: equipments.filter((e) => daysUntil(e.nextCalibration) < 0).length,
-    icon: AlertTriangle,
-    accent: "bg-rose-50 text-rose-600",
-  },
-];
+export default async function EquipmentPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q = "" } = await searchParams;
+  const all = await equipmentStore.list();
+  const query = q.trim().toLowerCase();
+  const equipments = query
+    ? all.filter(
+        (e) =>
+          e.code.toLowerCase().includes(query) ||
+          e.name.toLowerCase().includes(query) ||
+          e.model.toLowerCase().includes(query) ||
+          e.location.toLowerCase().includes(query),
+      )
+    : all;
 
-export default function EquipmentPage() {
+  const stats = [
+    {
+      label: "Thiết bị đang hoạt động",
+      value: all.filter((e) => e.status === "Hoạt động").length,
+      icon: CheckCircle2,
+      accent: "bg-emerald-50 text-emerald-600",
+    },
+    {
+      label: "Đang hiệu chuẩn / bảo trì",
+      value: all.filter((e) =>
+        ["Hiệu chuẩn", "Bảo trì"].includes(e.status),
+      ).length,
+      icon: Wrench,
+      accent: "bg-amber-50 text-amber-600",
+    },
+    {
+      label: "Sắp đến hạn hiệu chuẩn",
+      value: all.filter((e) => daysUntil(e.nextCalibration) <= 60).length,
+      icon: CalendarClock,
+      accent: "bg-blue-50 text-blue-600",
+    },
+    {
+      label: "Cảnh báo quá hạn",
+      value: all.filter((e) => daysUntil(e.nextCalibration) < 0).length,
+      icon: AlertTriangle,
+      accent: "bg-rose-50 text-rose-600",
+    },
+  ];
+
   return (
     <>
       <Header
@@ -116,22 +141,16 @@ export default function EquipmentPage() {
                   Mã thiết bị, vị trí đặt, lịch hiệu chuẩn và giờ sử dụng
                 </CardDescription>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 rounded-md border border-input bg-background px-2.5 h-9 text-sm w-full sm:w-56">
-                  <Search className="w-4 h-4 text-muted-foreground" />
-                  <input
-                    className="bg-transparent outline-none flex-1"
-                    placeholder="Tìm theo mã, tên..."
-                  />
-                </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <EntitySearchInput
+                  basePath="/equipment"
+                  placeholder="Tìm theo mã, tên..."
+                />
                 <Button variant="outline" size="sm">
                   <Filter />
                   Lọc
                 </Button>
-                <Button size="sm">
-                  <Plus />
-                  Thêm thiết bị
-                </Button>
+                <AddEquipmentDialog />
               </div>
             </CardHeader>
             <CardContent>
@@ -147,9 +166,22 @@ export default function EquipmentPage() {
                       <TableHead>HC kế tiếp</TableHead>
                       <TableHead>Giờ chạy</TableHead>
                       <TableHead>Trạng thái</TableHead>
+                      <TableHead className="w-[60px]"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
+                    {equipments.length === 0 && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={9}
+                          className="text-center text-sm text-muted-foreground py-8"
+                        >
+                          {query
+                            ? `Không có thiết bị nào khớp "${query}"`
+                            : "Chưa có thiết bị nào"}
+                        </TableCell>
+                      </TableRow>
+                    )}
                     {equipments.map((e) => {
                       const days = daysUntil(e.nextCalibration);
                       const dueSoon = days <= 30 && days >= 0;
@@ -194,6 +226,13 @@ export default function EquipmentPage() {
                             <Badge variant={statusVariant[e.status]}>
                               {e.status}
                             </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <DeleteEntityButton
+                              entity="equipment"
+                              id={e.id}
+                              label={e.name}
+                            />
                           </TableCell>
                         </TableRow>
                       );

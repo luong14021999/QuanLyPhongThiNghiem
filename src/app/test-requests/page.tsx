@@ -5,9 +5,7 @@ import {
   CheckCircle2,
   Receipt,
   PackageCheck,
-  Plus,
   Filter,
-  Search,
   ArrowRight,
   XCircle,
   Phone,
@@ -35,10 +33,15 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  testRequests,
   type TestRequest,
   type TestRequestStatus,
 } from "@/lib/mock-data";
+import { testRequestsStore } from "@/lib/data/test-requests";
+import { AddTestRequestDialog } from "@/components/test-requests/add-test-request-dialog";
+import { DeleteEntityButton } from "@/components/crud/delete-button";
+import { EntitySearchInput } from "@/components/crud/search-input";
+
+export const dynamic = "force-dynamic";
 
 const statusVariant: Record<
   TestRequestStatus,
@@ -53,59 +56,14 @@ const statusVariant: Record<
 };
 
 function totalOf(r: TestRequest) {
-  const subtotal = r.criteria.reduce((s, c) => s + c.unitPrice, 0) * r.expectedSamples;
+  const subtotal =
+    r.criteria.reduce((s, c) => s + c.unitPrice, 0) * r.expectedSamples;
   const vat = subtotal * (r.vatRate / 100);
   return { subtotal, vat, total: subtotal + vat };
 }
 
-const counts = testRequests.reduce<Record<TestRequestStatus, number>>(
-  (acc, r) => {
-    acc[r.status] = (acc[r.status] || 0) + 1;
-    return acc;
-  },
-  {
-    "Yêu cầu mới": 0,
-    "Đã báo giá": 0,
-    "KH chấp nhận": 0,
-    "Đã ký HĐ": 0,
-    "Đã nhận mẫu": 0,
-    "Đã hủy": 0,
-  },
-);
-
 const formatCurrency = (v: number) =>
   v.toLocaleString("vi-VN", { maximumFractionDigits: 0 });
-
-const totalValue = testRequests
-  .filter((r) => r.status !== "Đã hủy")
-  .reduce((sum, r) => sum + totalOf(r).total, 0);
-
-const stats = [
-  {
-    label: "Yêu cầu đang xử lý",
-    value: counts["Yêu cầu mới"] + counts["Đã báo giá"] + counts["KH chấp nhận"],
-    icon: Inbox,
-    accent: "bg-emerald-50 text-emerald-700",
-  },
-  {
-    label: "Đã ký HĐ trong quý",
-    value: counts["Đã ký HĐ"],
-    icon: FileSignature,
-    accent: "bg-blue-50 text-blue-600",
-  },
-  {
-    label: "Đã chuyển thành mẫu",
-    value: counts["Đã nhận mẫu"],
-    icon: PackageCheck,
-    accent: "bg-violet-50 text-violet-600",
-  },
-  {
-    label: "Giá trị HĐ dự kiến",
-    value: `${formatCurrency(totalValue / 1_000_000)}M`,
-    icon: Receipt,
-    accent: "bg-amber-50 text-amber-600",
-  },
-];
 
 const pipelineStages: { label: string; status: TestRequestStatus }[] = [
   { label: "Yêu cầu mới", status: "Yêu cầu mới" },
@@ -115,10 +73,76 @@ const pipelineStages: { label: string; status: TestRequestStatus }[] = [
   { label: "Đã nhận mẫu", status: "Đã nhận mẫu" },
 ];
 
-const demoRequest = testRequests.find((r) => r.code.endsWith("00124"))!;
-const demoTotals = totalOf(demoRequest);
+export default async function TestRequestsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q = "" } = await searchParams;
+  const all = await testRequestsStore.list();
+  const query = q.trim().toLowerCase();
+  const testRequests = query
+    ? all.filter(
+        (r) =>
+          r.code.toLowerCase().includes(query) ||
+          r.customer.toLowerCase().includes(query) ||
+          r.matrix.toLowerCase().includes(query) ||
+          r.contact.toLowerCase().includes(query),
+      )
+    : all;
 
-export default function TestRequestsPage() {
+  const counts = all.reduce<Record<TestRequestStatus, number>>(
+    (acc, r) => {
+      acc[r.status] = (acc[r.status] || 0) + 1;
+      return acc;
+    },
+    {
+      "Yêu cầu mới": 0,
+      "Đã báo giá": 0,
+      "KH chấp nhận": 0,
+      "Đã ký HĐ": 0,
+      "Đã nhận mẫu": 0,
+      "Đã hủy": 0,
+    },
+  );
+
+  const totalValue = all
+    .filter((r) => r.status !== "Đã hủy")
+    .reduce((sum, r) => sum + totalOf(r).total, 0);
+
+  const stats = [
+    {
+      label: "Yêu cầu đang xử lý",
+      value:
+        counts["Yêu cầu mới"] + counts["Đã báo giá"] + counts["KH chấp nhận"],
+      icon: Inbox,
+      accent: "bg-emerald-50 text-emerald-700",
+    },
+    {
+      label: "Đã ký HĐ trong quý",
+      value: counts["Đã ký HĐ"],
+      icon: FileSignature,
+      accent: "bg-blue-50 text-blue-600",
+    },
+    {
+      label: "Đã chuyển thành mẫu",
+      value: counts["Đã nhận mẫu"],
+      icon: PackageCheck,
+      accent: "bg-violet-50 text-violet-600",
+    },
+    {
+      label: "Giá trị HĐ dự kiến",
+      value: `${formatCurrency(totalValue / 1_000_000)}M`,
+      icon: Receipt,
+      accent: "bg-amber-50 text-amber-600",
+    },
+  ];
+
+  const demoRequest = all.find((r) => r.code.endsWith("00124")) ?? all[0];
+  const demoTotals = demoRequest
+    ? totalOf(demoRequest)
+    : { subtotal: 0, vat: 0, total: 0 };
+
   return (
     <>
       <Header
@@ -191,21 +215,15 @@ export default function TestRequestsPage() {
               </CardDescription>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-2 rounded-md border border-input bg-background px-2.5 h-9 text-sm w-full sm:w-56">
-                <Search className="w-4 h-4 text-muted-foreground" />
-                <input
-                  className="bg-transparent outline-none flex-1"
-                  placeholder="Tìm mã, khách hàng..."
-                />
-              </div>
+              <EntitySearchInput
+                basePath="/test-requests"
+                placeholder="Tìm mã, khách hàng..."
+              />
               <Button variant="outline" size="sm">
                 <Filter />
                 Lọc
               </Button>
-              <Button size="sm">
-                <Plus />
-                Tạo yêu cầu
-              </Button>
+              <AddTestRequestDialog />
             </div>
           </CardHeader>
           <CardContent>
@@ -228,9 +246,22 @@ export default function TestRequestsPage() {
                     <TableHead className="text-right">Giá trị (VND)</TableHead>
                     <TableHead>Hạn KH</TableHead>
                     <TableHead>Trạng thái</TableHead>
+                    <TableHead className="w-[60px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
+                  {testRequests.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={8}
+                        className="text-center text-sm text-muted-foreground py-8"
+                      >
+                        {query
+                          ? `Không có yêu cầu nào khớp "${query}"`
+                          : "Chưa có yêu cầu nào"}
+                      </TableCell>
+                    </TableRow>
+                  )}
                   {testRequests.map((r) => {
                     const total = totalOf(r);
                     return (
@@ -291,6 +322,13 @@ export default function TestRequestsPage() {
                             {r.status}
                           </Badge>
                         </TableCell>
+                        <TableCell>
+                          <DeleteEntityButton
+                            entity="test-requests"
+                            id={r.id}
+                            label={r.code}
+                          />
+                        </TableCell>
                       </TableRow>
                     );
                   })}
@@ -300,6 +338,7 @@ export default function TestRequestsPage() {
           </CardContent>
         </Card>
 
+        {demoRequest && (
         <Card>
           <CardHeader>
             <CardTitle>Demo phiếu yêu cầu thử nghiệm</CardTitle>
@@ -445,6 +484,7 @@ export default function TestRequestsPage() {
             </div>
           </CardContent>
         </Card>
+        )}
 
         <Card>
           <CardHeader>

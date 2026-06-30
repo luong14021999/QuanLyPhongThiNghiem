@@ -2,12 +2,17 @@ import {
   Users,
   UserPlus,
   Filter,
-  Search,
   GraduationCap,
   Mail,
   Phone,
   Building2,
 } from "lucide-react";
+import { staffStore } from "@/lib/data/staff";
+import { AddStaffDialog } from "@/components/staff/add-staff-dialog";
+import { DeleteEntityButton } from "@/components/crud/delete-button";
+import { EntitySearchInput } from "@/components/crud/search-input";
+
+export const dynamic = "force-dynamic";
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,43 +39,64 @@ const statusVariant = {
   "Thử việc": "secondary",
 } as const;
 
-const departments = Array.from(new Set(staff.map((s) => s.department)));
+export default async function PersonnelPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q = "" } = await searchParams;
+  const all = await staffStore.list();
+  const query = q.trim().toLowerCase();
+  const staff = query
+    ? all.filter(
+        (s) =>
+          s.fullName.toLowerCase().includes(query) ||
+          s.code.toLowerCase().includes(query) ||
+          s.department.toLowerCase().includes(query) ||
+          s.position.toLowerCase().includes(query),
+      )
+    : all;
 
-const stats = [
-  {
-    label: "Tổng nhân sự PTN",
-    value: staff.length,
-    icon: Users,
-    accent: "bg-emerald-50 text-emerald-700",
-  },
-  {
-    label: "Đang làm việc",
-    value: staff.filter((s) => s.status === "Đang làm việc").length,
-    icon: Building2,
-    accent: "bg-blue-50 text-blue-600",
-  },
-  {
-    label: "Nhóm chuyên môn",
-    value: departments.length,
-    icon: GraduationCap,
-    accent: "bg-violet-50 text-violet-600",
-  },
-  {
-    label: "Thử việc",
-    value: staff.filter((s) => s.status === "Thử việc").length,
-    icon: UserPlus,
-    accent: "bg-amber-50 text-amber-600",
-  },
-];
+  const departments = Array.from(new Set(all.map((s) => s.department)));
 
-const trainingFeed = staff
-  .flatMap((s) =>
-    s.trainings.map((t) => ({ name: s.fullName, course: t.name, year: t.year })),
-  )
-  .sort((a, b) => b.year - a.year)
-  .slice(0, 6);
+  const stats = [
+    {
+      label: "Tổng nhân sự PTN",
+      value: all.length,
+      icon: Users,
+      accent: "bg-emerald-50 text-emerald-700",
+    },
+    {
+      label: "Đang làm việc",
+      value: all.filter((s) => s.status === "Đang làm việc").length,
+      icon: Building2,
+      accent: "bg-blue-50 text-blue-600",
+    },
+    {
+      label: "Nhóm chuyên môn",
+      value: departments.length,
+      icon: GraduationCap,
+      accent: "bg-violet-50 text-violet-600",
+    },
+    {
+      label: "Thử việc",
+      value: all.filter((s) => s.status === "Thử việc").length,
+      icon: UserPlus,
+      accent: "bg-amber-50 text-amber-600",
+    },
+  ];
 
-export default function PersonnelPage() {
+  const trainingFeed = all
+    .flatMap((s) =>
+      s.trainings.map((t) => ({
+        name: s.fullName,
+        course: t.name,
+        year: t.year,
+      })),
+    )
+    .sort((a, b) => b.year - a.year)
+    .slice(0, 6);
+
   return (
     <>
       <Header
@@ -108,22 +134,16 @@ export default function PersonnelPage() {
                   chuyên môn
                 </CardDescription>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 rounded-md border border-input bg-background px-2.5 h-9 text-sm w-full sm:w-56">
-                  <Search className="w-4 h-4 text-muted-foreground" />
-                  <input
-                    className="bg-transparent outline-none flex-1"
-                    placeholder="Tìm tên, mã, nhóm..."
-                  />
-                </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <EntitySearchInput
+                  basePath="/personnel"
+                  placeholder="Tìm tên, mã, nhóm..."
+                />
                 <Button variant="outline" size="sm">
                   <Filter />
                   Lọc
                 </Button>
-                <Button size="sm">
-                  <UserPlus />
-                  Thêm nhân sự
-                </Button>
+                <AddStaffDialog />
               </div>
             </CardHeader>
             <CardContent>
@@ -138,9 +158,22 @@ export default function PersonnelPage() {
                       <TableHead>Liên hệ</TableHead>
                       <TableHead>Vào làm</TableHead>
                       <TableHead>Trạng thái</TableHead>
+                      <TableHead className="w-[60px]"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
+                    {staff.length === 0 && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={8}
+                          className="text-center text-sm text-muted-foreground py-8"
+                        >
+                          {query
+                            ? `Không có nhân sự nào khớp "${query}"`
+                            : "Chưa có nhân sự nào"}
+                        </TableCell>
+                      </TableRow>
+                    )}
                     {staff.map((s) => (
                       <TableRow key={s.id}>
                         <TableCell className="font-mono">{s.code}</TableCell>
@@ -170,6 +203,13 @@ export default function PersonnelPage() {
                           <Badge variant={statusVariant[s.status]}>
                             {s.status}
                           </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <DeleteEntityButton
+                            entity="staff"
+                            id={s.id}
+                            label={s.fullName}
+                          />
                         </TableCell>
                       </TableRow>
                     ))}

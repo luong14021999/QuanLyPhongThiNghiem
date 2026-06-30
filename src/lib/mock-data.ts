@@ -3038,6 +3038,391 @@ export const analysisResults: AnalysisResult[] = [
   },
 ];
 
+export type FeedbackRating =
+  | "Nhiệt tình"
+  | "Tốt"
+  | "Khá"
+  | "Bình thường"
+  | "Trung bình"
+  | "Kém"
+  | "Cao"
+  | "Hợp lý"
+  | "Thấp"
+  | "Nhanh"
+  | "Đúng hạn"
+  | "Chậm";
+
+export type CustomerFeedback = {
+  id: string;
+  code: string;
+  customerName?: string;
+  customerKind?: string;
+  submittedAt: string;
+  serviceAttitude: "Nhiệt tình" | "Tốt" | "Bình thường" | "Kém";
+  fee: "Cao" | "Hợp lý" | "Thấp";
+  quality: "Tốt" | "Khá" | "Trung bình" | "Kém";
+  infoAvailability: "Tốt" | "Khá" | "Trung bình" | "Kém";
+  deliveryTime: "Nhanh" | "Đúng hạn" | "Bình thường" | "Chậm";
+  comments?: string;
+  isComplaint: boolean;
+  complaintStatus?: "Mới" | "Đang xử lý" | "Đã trả lời" | "Đã đóng";
+  responseDate?: string;
+  responder?: string;
+  responseNote?: string;
+};
+
+export const customerFeedbacks: CustomerFeedback[] = [
+  {
+    id: "fb1",
+    code: "YK-VNNTH-2026-018",
+    customerName: "HTX Cam Vân Du",
+    customerKind: "HTX / Trang trại",
+    submittedAt: "2026-06-24",
+    serviceAttitude: "Nhiệt tình",
+    fee: "Hợp lý",
+    quality: "Tốt",
+    infoAvailability: "Tốt",
+    deliveryTime: "Đúng hạn",
+    comments:
+      "Cảm ơn Viện đã tư vấn rất kỹ về MRL EU cho lô cam xuất khẩu. Mong tiếp tục được hỗ trợ.",
+    isComplaint: false,
+  },
+  {
+    id: "fb2",
+    code: "YK-VNNTH-2026-017",
+    customerName: "HTX Nông nghiệp Đông Sơn",
+    customerKind: "HTX / Trang trại",
+    submittedAt: "2026-06-22",
+    serviceAttitude: "Tốt",
+    fee: "Hợp lý",
+    quality: "Tốt",
+    infoAvailability: "Khá",
+    deliveryTime: "Đúng hạn",
+    comments: "Đề nghị Viện cử cán bộ xuống tận ruộng để tư vấn bón phân.",
+    isComplaint: false,
+  },
+  {
+    id: "fb3",
+    code: "YK-VNNTH-2026-016",
+    customerName: "Trang trại Rau an toàn Yên Định",
+    customerKind: "HTX / Trang trại",
+    submittedAt: "2026-06-20",
+    serviceAttitude: "Tốt",
+    fee: "Hợp lý",
+    quality: "Khá",
+    infoAvailability: "Khá",
+    deliveryTime: "Bình thường",
+    comments:
+      "Thời gian trả kết quả BVTV hơi chậm khi mùa cao điểm. Mong Viện rút ngắn xuống 4-5 ngày.",
+    isComplaint: true,
+    complaintStatus: "Đang xử lý",
+    responder: "Trần Thị Mai",
+    responseNote: "Đã ghi nhận, đang lập kế hoạch tăng năng lực GC-MS Q3/2026.",
+  },
+  {
+    id: "fb4",
+    code: "YK-VNNTH-2026-015",
+    customerName: "Phòng NN&PTNT huyện Thọ Xuân",
+    customerKind: "Cơ quan nhà nước",
+    submittedAt: "2026-06-18",
+    serviceAttitude: "Nhiệt tình",
+    fee: "Hợp lý",
+    quality: "Tốt",
+    infoAvailability: "Tốt",
+    deliveryTime: "Nhanh",
+    comments: "Báo cáo đợt quan trắc kênh Bái Thượng rất chi tiết.",
+    isComplaint: false,
+  },
+  {
+    id: "fb5",
+    code: "YK-VNNTH-2026-014",
+    customerName: "Công ty CP Phân bón Tiến Nông",
+    customerKind: "Doanh nghiệp",
+    submittedAt: "2026-06-15",
+    serviceAttitude: "Tốt",
+    fee: "Cao",
+    quality: "Tốt",
+    infoAvailability: "Khá",
+    deliveryTime: "Đúng hạn",
+    comments:
+      "Đề nghị Viện xem xét chính sách giảm giá cho KH gửi mẫu thường xuyên (> 50 mẫu/quý).",
+    isComplaint: false,
+  },
+  {
+    id: "fb6",
+    code: "YK-VNNTH-2026-013",
+    submittedAt: "2026-06-12",
+    serviceAttitude: "Tốt",
+    fee: "Hợp lý",
+    quality: "Tốt",
+    infoAvailability: "Khá",
+    deliveryTime: "Đúng hạn",
+    comments: "Không có ý kiến gì thêm. Mong Viện duy trì chất lượng.",
+    isComplaint: false,
+  },
+  {
+    id: "fb7",
+    code: "YK-VNNTH-2026-012",
+    customerName: "Công ty TNHH Mía đường Lam Sơn",
+    customerKind: "Doanh nghiệp",
+    submittedAt: "2026-06-08",
+    serviceAttitude: "Bình thường",
+    fee: "Cao",
+    quality: "Khá",
+    infoAvailability: "Trung bình",
+    deliveryTime: "Chậm",
+    comments:
+      "Kết quả phân tích đợt khảo sát đất tháng 5 trễ 3 ngày so với cam kết. Phiếu KQ thiếu phần khuyến nghị bón phân.",
+    isComplaint: true,
+    complaintStatus: "Đã trả lời",
+    responseDate: "2026-06-10",
+    responder: "Nguyễn Đình Lương",
+    responseNote:
+      "Xin lỗi quý KH. Đã bổ sung phần khuyến nghị bón phân và miễn phí phân tích lại 1 mẫu trong đợt tới. Cam kết cải tiến quy trình kiểm soát hạn trả.",
+  },
+];
+
+export type ServiceGroup =
+  | "Phân tích đất"
+  | "Phân tích nước"
+  | "Phân tích phân bón"
+  | "Phân tích BVTV"
+  | "Tư vấn nông nghiệp";
+
+export type ServiceItem = {
+  id: string;
+  code: string;
+  name: string;
+  group: ServiceGroup;
+  description: string;
+  unit: string;
+  basePrice: number;
+  turnaround: string;
+  methods?: string[];
+  vilas: boolean;
+};
+
+export const services: ServiceItem[] = [
+  {
+    id: "sv1",
+    code: "DV-DAT-01",
+    name: "Phân tích dinh dưỡng đất",
+    group: "Phân tích đất",
+    description:
+      "Bộ chỉ tiêu dinh dưỡng cơ bản: pHKCl, OM%, N tổng, P2O5 dễ tiêu, K2O dễ tiêu, CEC",
+    unit: "mẫu",
+    basePrice: 1100000,
+    turnaround: "7 ngày",
+    methods: ["TCVN 5979:2007", "TCVN 8941:2011", "Bray-II"],
+    vilas: true,
+  },
+  {
+    id: "sv2",
+    code: "DV-DAT-02",
+    name: "Phân tích thoái hóa đất",
+    group: "Phân tích đất",
+    description:
+      "Đánh giá thoái hóa: pH, OM%, Al/Mn trao đổi, độ chua, độ no bazơ, kết cấu đất",
+    unit: "mẫu",
+    basePrice: 1450000,
+    turnaround: "10 ngày",
+    vilas: true,
+  },
+  {
+    id: "sv3",
+    code: "DV-DAT-03",
+    name: "Phân tích ô nhiễm đất (KLN)",
+    group: "Phân tích đất",
+    description: "As, Pb, Cd, Cu, Zn, Cr, Hg trong đất canh tác",
+    unit: "mẫu",
+    basePrice: 1850000,
+    turnaround: "7 ngày",
+    methods: ["TCVN 6649:2000", "TCVN 7929:2008"],
+    vilas: true,
+  },
+  {
+    id: "sv4",
+    code: "DV-DAT-04",
+    name: "Phân tích nông hóa đất",
+    group: "Phân tích đất",
+    description:
+      "Bộ chỉ tiêu nông hóa: N, P, K, Ca, Mg, S dễ tiêu phục vụ khuyến cáo bón phân",
+    unit: "mẫu",
+    basePrice: 1280000,
+    turnaround: "7 ngày",
+    vilas: true,
+  },
+  {
+    id: "sv5",
+    code: "DV-DAT-05",
+    name: "Phân tích thổ nhưỡng đất",
+    group: "Phân tích đất",
+    description:
+      "Phân loại thổ nhưỡng, cơ giới đất, thành phần khoáng – phục vụ quy hoạch SX",
+    unit: "mẫu",
+    basePrice: 1650000,
+    turnaround: "14 ngày",
+    vilas: false,
+  },
+  {
+    id: "sv6",
+    code: "DV-NUOC-01",
+    name: "Phân tích chất lượng nước tưới",
+    group: "Phân tích nước",
+    description: "pH, EC, DO, độ đục, TDS, NH4+, NO3-, PO4 3-, Coliform",
+    unit: "mẫu",
+    basePrice: 980000,
+    turnaround: "5 ngày",
+    methods: ["TCVN 6492:2011", "TCVN 6187-1:2009"],
+    vilas: true,
+  },
+  {
+    id: "sv7",
+    code: "DV-NUOC-02",
+    name: "Phân tích ô nhiễm nước",
+    group: "Phân tích nước",
+    description: "KLN trong nước (As, Pb, Cd, Hg, Cr), COD, BOD5, dầu mỡ",
+    unit: "mẫu",
+    basePrice: 1450000,
+    turnaround: "7 ngày",
+    methods: ["SMEWW 3114B", "SMEWW 5220C"],
+    vilas: true,
+  },
+  {
+    id: "sv8",
+    code: "DV-PB-01",
+    name: "Phân tích chất lượng phân bón hữu cơ",
+    group: "Phân tích phân bón",
+    description: "OM%, N, P2O5, K2O tổng & hữu hiệu, độ ẩm, axit humic",
+    unit: "mẫu",
+    basePrice: 1050000,
+    turnaround: "7 ngày",
+    vilas: true,
+  },
+  {
+    id: "sv9",
+    code: "DV-PB-02",
+    name: "Phân tích chất lượng phân bón vô cơ",
+    group: "Phân tích phân bón",
+    description:
+      "N tổng, P2O5 hữu hiệu, K2O hữu hiệu, độ ẩm, biuret, ẩm – phục vụ kiểm tra chất lượng theo NĐ 84/2019",
+    unit: "mẫu",
+    basePrice: 1180000,
+    turnaround: "7 ngày",
+    methods: ["TCVN 8559:2010"],
+    vilas: true,
+  },
+  {
+    id: "sv10",
+    code: "DV-BVTV-01",
+    name: "Phân tích BVTV nhóm lân hữu cơ trong đất",
+    group: "Phân tích BVTV",
+    description:
+      "Định lượng các BVTV lân hữu cơ (Chlorpyrifos, Diazinon, Profenofos…) trong đất canh tác",
+    unit: "mẫu",
+    basePrice: 1750000,
+    turnaround: "10 ngày",
+    methods: ["GC-MS QuEChERS"],
+    vilas: true,
+  },
+  {
+    id: "sv11",
+    code: "DV-BVTV-02",
+    name: "Phân tích BVTV nhóm lân hữu cơ trong nước",
+    group: "Phân tích BVTV",
+    description:
+      "Định lượng các BVTV lân hữu cơ trong nước mặt, nước tưới",
+    unit: "mẫu",
+    basePrice: 1850000,
+    turnaround: "10 ngày",
+    methods: ["GC-MS", "LC-MS/MS"],
+    vilas: true,
+  },
+  {
+    id: "sv12",
+    code: "DV-BVTV-03",
+    name: "Phân tích BVTV nhóm lân hữu cơ trong nông sản",
+    group: "Phân tích BVTV",
+    description:
+      "Định lượng dư lượng BVTV trên rau quả tươi/khô, đối chiếu MRL Codex/EU",
+    unit: "mẫu",
+    basePrice: 1950000,
+    turnaround: "10 ngày",
+    methods: ["QuEChERS GC-MS"],
+    vilas: true,
+  },
+  {
+    id: "sv13",
+    code: "TV-01",
+    name: "Tư vấn dịch vụ phân tích",
+    group: "Tư vấn nông nghiệp",
+    description:
+      "Tư vấn chọn chỉ tiêu, phương pháp, mẫu cần lấy phù hợp mục đích KH",
+    unit: "buổi",
+    basePrice: 0,
+    turnaround: "Trong ngày",
+    vilas: false,
+  },
+  {
+    id: "sv14",
+    code: "TV-02",
+    name: "Tư vấn sử dụng kết quả phân tích",
+    group: "Tư vấn nông nghiệp",
+    description: "Diễn giải KQ, đối chiếu QCVN, khuyến nghị hành động cho KH",
+    unit: "buổi",
+    basePrice: 500000,
+    turnaround: "3 ngày",
+    vilas: false,
+  },
+  {
+    id: "sv15",
+    code: "TV-03",
+    name: "Tư vấn sử dụng đất",
+    group: "Tư vấn nông nghiệp",
+    description:
+      "Khuyến cáo cải tạo đất chua, đất nhiễm mặn, đất thoái hóa cho HTX và nông hộ",
+    unit: "buổi",
+    basePrice: 850000,
+    turnaround: "5 ngày",
+    vilas: false,
+  },
+  {
+    id: "sv16",
+    code: "TV-04",
+    name: "Tư vấn sử dụng phân bón",
+    group: "Tư vấn nông nghiệp",
+    description: "Lập công thức bón phân theo loại đất × cây trồng × mùa vụ",
+    unit: "buổi",
+    basePrice: 850000,
+    turnaround: "5 ngày",
+    vilas: false,
+  },
+  {
+    id: "sv17",
+    code: "TV-05",
+    name: "Tư vấn chế độ canh tác",
+    group: "Tư vấn nông nghiệp",
+    description:
+      "Đề xuất luân canh, xen canh, mật độ trồng phù hợp cho từng loại cây",
+    unit: "buổi",
+    basePrice: 1200000,
+    turnaround: "7 ngày",
+    vilas: false,
+  },
+  {
+    id: "sv18",
+    code: "TV-06",
+    name: "Tư vấn dinh dưỡng cây trồng",
+    group: "Tư vấn nông nghiệp",
+    description:
+      "Phân tích triệu chứng thiếu/thừa dinh dưỡng, đề xuất giải pháp khắc phục",
+    unit: "buổi",
+    basePrice: 950000,
+    turnaround: "5 ngày",
+    vilas: false,
+  },
+];
+
 export const dashboardKpis = {
   sampleTotal: samples.length,
   sampleInProgress: samples.filter((s) =>

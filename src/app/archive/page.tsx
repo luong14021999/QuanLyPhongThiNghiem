@@ -1,8 +1,6 @@
 import {
   Archive,
   Filter,
-  Search,
-  Plus,
   Snowflake,
   Thermometer,
   Box,
@@ -11,6 +9,12 @@ import {
   ClipboardCheck,
   Trash2,
 } from "lucide-react";
+import { archivedSamplesStore } from "@/lib/data/archived-samples";
+import { AddArchivedSampleDialog } from "@/components/archive/add-archived-sample-dialog";
+import { DeleteEntityButton } from "@/components/crud/delete-button";
+import { EntitySearchInput } from "@/components/crud/search-input";
+
+export const dynamic = "force-dynamic";
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,13 +34,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { archivedSamples } from "@/lib/mock-data";
+import { type ArchivedSample } from "@/lib/mock-data";
 
-const statusVariant = {
+const statusVariant: Record<
+  ArchivedSample["status"],
+  "default" | "success" | "secondary"
+> = {
   "Đang lưu": "default",
   "Đã phân tích QC": "success",
   "Đã hủy": "secondary",
-} as const;
+};
 
 const today = new Date("2026-06-21");
 
@@ -52,49 +59,67 @@ function locationIcon(loc: string) {
   return Box;
 }
 
-const active = archivedSamples.filter((s) => s.status === "Đang lưu");
-const expiringSoon = active.filter((s) => daysUntil(s.expiryAt) <= 60);
-const qcDone = archivedSamples.filter((s) => s.status === "Đã phân tích QC");
-const destroyed = archivedSamples.filter((s) => s.status === "Đã hủy");
+export default async function ArchivePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q = "" } = await searchParams;
+  const all = await archivedSamplesStore.list();
+  const query = q.trim().toLowerCase();
+  const archivedSamples = query
+    ? all.filter(
+        (s) =>
+          s.archiveCode.toLowerCase().includes(query) ||
+          s.originalSampleCode.toLowerCase().includes(query) ||
+          s.customer.toLowerCase().includes(query) ||
+          s.type.toLowerCase().includes(query) ||
+          s.location.toLowerCase().includes(query),
+      )
+    : all;
 
-const stats = [
-  {
-    label: "Mẫu đang lưu",
-    value: active.length,
-    icon: Archive,
-    accent: "bg-emerald-50 text-emerald-700",
-  },
-  {
-    label: "Sắp hết hạn (≤ 60 ngày)",
-    value: expiringSoon.length,
-    icon: AlertTriangle,
-    accent: "bg-amber-50 text-amber-600",
-  },
-  {
-    label: "Đã phân tích QC năm nay",
-    value: qcDone.length,
-    icon: ClipboardCheck,
-    accent: "bg-blue-50 text-blue-600",
-  },
-  {
-    label: "Mẫu đã hủy",
-    value: destroyed.length,
-    icon: Trash2,
-    accent: "bg-rose-50 text-rose-600",
-  },
-];
+  const active = all.filter((s) => s.status === "Đang lưu");
+  const expiringSoon = active.filter((s) => daysUntil(s.expiryAt) <= 60);
+  const qcDone = all.filter((s) => s.status === "Đã phân tích QC");
+  const destroyed = all.filter((s) => s.status === "Đã hủy");
 
-const qcDueSchedule = [...active]
-  .map((s) => {
-    const archived = new Date(s.archivedAt);
-    const nextQc = new Date(archived);
-    nextQc.setMonth(nextQc.getMonth() + 3);
-    return { ...s, nextQcAt: nextQc.toISOString().slice(0, 10) };
-  })
-  .sort((a, b) => daysUntil(a.nextQcAt) - daysUntil(b.nextQcAt))
-  .slice(0, 5);
+  const stats = [
+    {
+      label: "Mẫu đang lưu",
+      value: active.length,
+      icon: Archive,
+      accent: "bg-emerald-50 text-emerald-700",
+    },
+    {
+      label: "Sắp hết hạn (≤ 60 ngày)",
+      value: expiringSoon.length,
+      icon: AlertTriangle,
+      accent: "bg-amber-50 text-amber-600",
+    },
+    {
+      label: "Đã phân tích QC năm nay",
+      value: qcDone.length,
+      icon: ClipboardCheck,
+      accent: "bg-blue-50 text-blue-600",
+    },
+    {
+      label: "Mẫu đã hủy",
+      value: destroyed.length,
+      icon: Trash2,
+      accent: "bg-rose-50 text-rose-600",
+    },
+  ];
 
-export default function ArchivePage() {
+  const qcDueSchedule = [...active]
+    .map((s) => {
+      const archived = new Date(s.archivedAt);
+      const nextQc = new Date(archived);
+      nextQc.setMonth(nextQc.getMonth() + 3);
+      return { ...s, nextQcAt: nextQc.toISOString().slice(0, 10) };
+    })
+    .sort((a, b) => daysUntil(a.nextQcAt) - daysUntil(b.nextQcAt))
+    .slice(0, 5);
+
   return (
     <>
       <Header
@@ -132,13 +157,10 @@ export default function ArchivePage() {
               </CardDescription>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-2 rounded-md border border-input bg-background px-2.5 h-9 text-sm w-full sm:w-56">
-                <Search className="w-4 h-4 text-muted-foreground" />
-                <input
-                  className="bg-transparent outline-none flex-1"
-                  placeholder="Tìm mã lưu, mã mẫu gốc..."
-                />
-              </div>
+              <EntitySearchInput
+                basePath="/archive"
+                placeholder="Tìm mã lưu, mã mẫu gốc..."
+              />
               <Button variant="outline" size="sm">
                 <Filter />
                 Lọc
@@ -147,10 +169,7 @@ export default function ArchivePage() {
                 <Trash2 />
                 Lập BB hủy
               </Button>
-              <Button size="sm">
-                <Plus />
-                Thêm mẫu lưu
-              </Button>
+              <AddArchivedSampleDialog />
             </div>
           </CardHeader>
           <CardContent>
@@ -174,9 +193,22 @@ export default function ArchivePage() {
                     <TableHead>Hạn lưu</TableHead>
                     <TableHead>Lượng còn</TableHead>
                     <TableHead>Trạng thái</TableHead>
+                    <TableHead className="w-[60px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
+                  {archivedSamples.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={9}
+                        className="text-center text-sm text-muted-foreground py-8"
+                      >
+                        {query
+                          ? `Không có mẫu lưu nào khớp "${query}"`
+                          : "Chưa có mẫu lưu nào"}
+                      </TableCell>
+                    </TableRow>
+                  )}
                   {archivedSamples.map((s) => {
                     const expiryDays = daysUntil(s.expiryAt);
                     const expiringSoonFlag =
@@ -226,6 +258,13 @@ export default function ArchivePage() {
                           <Badge variant={statusVariant[s.status]}>
                             {s.status}
                           </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <DeleteEntityButton
+                            entity="archived-samples"
+                            id={s.id}
+                            label={s.archiveCode}
+                          />
                         </TableCell>
                       </TableRow>
                     );

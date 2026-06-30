@@ -4,7 +4,6 @@ import {
   Download,
   Printer,
   QrCode,
-  Search,
   User,
 } from "lucide-react";
 import { Header } from "@/components/layout/header";
@@ -29,7 +28,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { samples, type SampleStatus } from "@/lib/mock-data";
+import { type SampleStatus } from "@/lib/mock-data";
+import { samplesStore } from "@/lib/data/samples";
+import { AddSampleDialog } from "@/components/samples/add-sample-dialog";
+import { DeleteEntityButton } from "@/components/crud/delete-button";
+import { EntitySearchInput } from "@/components/crud/search-input";
+
+export const dynamic = "force-dynamic";
 
 const statusVariant: Record<
   SampleStatus,
@@ -42,12 +47,27 @@ const statusVariant: Record<
   "Đã trả KQ": "outline",
 };
 
-const statusCounts = samples.reduce<Record<string, number>>((acc, s) => {
-  acc[s.status] = (acc[s.status] || 0) + 1;
-  return acc;
-}, {});
-
-export default function SamplesPage() {
+export default async function SamplesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q = "" } = await searchParams;
+  const all = await samplesStore.list();
+  const query = q.trim().toLowerCase();
+  const samples = query
+    ? all.filter(
+        (s) =>
+          s.code.toLowerCase().includes(query) ||
+          s.customer.toLowerCase().includes(query) ||
+          s.type.toLowerCase().includes(query) ||
+          s.technician.toLowerCase().includes(query),
+      )
+    : all;
+  const statusCounts = all.reduce<Record<string, number>>((acc, s) => {
+    acc[s.status] = (acc[s.status] || 0) + 1;
+    return acc;
+  }, {});
   return (
     <>
       <Header
@@ -165,17 +185,17 @@ export default function SamplesPage() {
             <div>
               <CardTitle>Danh sách mẫu</CardTitle>
               <CardDescription>
-                Tổng {samples.length} mẫu · cập nhật lần cuối hôm nay
+                Tổng {all.length} mẫu{" "}
+                {query && all.length !== samples.length
+                  ? `· lọc còn ${samples.length}`
+                  : "· lưu trong data/samples.json"}
               </CardDescription>
             </div>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-              <div className="flex items-center gap-2 rounded-md border border-input bg-background px-2.5 h-9 text-sm w-full sm:w-72">
-                <Search className="w-4 h-4 text-muted-foreground" />
-                <input
-                  className="bg-transparent outline-none flex-1"
-                  placeholder="Tìm mã, khách hàng..."
-                />
-              </div>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-wrap">
+              <EntitySearchInput
+                basePath="/samples"
+                placeholder="Tìm mã, khách hàng..."
+              />
               <Button variant="outline" size="sm">
                 <Filter />
                 Lọc
@@ -184,6 +204,7 @@ export default function SamplesPage() {
                 <Download />
                 Xuất Excel
               </Button>
+              <AddSampleDialog />
             </div>
           </CardHeader>
           <CardContent>
@@ -207,9 +228,22 @@ export default function SamplesPage() {
                     <TableHead>Phụ trách</TableHead>
                     <TableHead>Tiến độ</TableHead>
                     <TableHead>Trạng thái</TableHead>
+                    <TableHead className="w-[60px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
+                  {samples.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={9}
+                        className="text-center text-sm text-muted-foreground py-8"
+                      >
+                        {query
+                          ? `Không có mẫu nào khớp "${query}"`
+                          : "Chưa có mẫu nào"}
+                      </TableCell>
+                    </TableRow>
+                  )}
                   {samples.map((s) => (
                     <TableRow key={s.id}>
                       <TableCell className="font-mono font-medium">
@@ -243,6 +277,13 @@ export default function SamplesPage() {
                         <Badge variant={statusVariant[s.status]}>
                           {s.status}
                         </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <DeleteEntityButton
+                          entity="samples"
+                          id={s.id}
+                          label={s.code}
+                        />
                       </TableCell>
                     </TableRow>
                   ))}
