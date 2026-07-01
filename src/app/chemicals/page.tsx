@@ -33,6 +33,7 @@ import {
 import { chemicalUsageLogs, type Chemical } from "@/lib/mock-data";
 import { chemicalsStore } from "@/lib/data/chemicals";
 import { AddChemicalDialog } from "@/components/chemicals/add-chemical-dialog";
+import { EditChemicalDialog } from "@/components/chemicals/edit-chemical-dialog";
 import { DeleteEntityButton } from "@/components/crud/delete-button";
 import { EntitySearchInput } from "@/components/crud/search-input";
 
@@ -245,11 +246,14 @@ export default async function ChemicalsPage({
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <DeleteEntityButton
-                            entity="chemicals"
-                            id={c.id}
-                            label={c.name}
-                          />
+                          <div className="flex items-center gap-0.5">
+                            <EditChemicalDialog row={c} />
+                            <DeleteEntityButton
+                              entity="chemicals"
+                              id={c.id}
+                              label={c.name}
+                            />
+                          </div>
                         </TableCell>
                       </TableRow>
                     );

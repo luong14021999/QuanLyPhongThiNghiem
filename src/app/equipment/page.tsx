@@ -34,6 +34,7 @@ import {
 } from "@/lib/mock-data";
 import { equipmentStore } from "@/lib/data/equipment";
 import { AddEquipmentDialog } from "@/components/equipment/add-equipment-dialog";
+import { EditEquipmentDialog } from "@/components/equipment/edit-equipment-dialog";
 import { DeleteEntityButton } from "@/components/crud/delete-button";
 import { EntitySearchInput } from "@/components/crud/search-input";
 
@@ -228,11 +229,14 @@ export default async function EquipmentPage({
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <DeleteEntityButton
-                              entity="equipment"
-                              id={e.id}
-                              label={e.name}
-                            />
+                            <div className="flex items-center gap-0.5">
+                              <EditEquipmentDialog row={e} />
+                              <DeleteEntityButton
+                                entity="equipment"
+                                id={e.id}
+                                label={e.name}
+                              />
+                            </div>
                           </TableCell>
                         </TableRow>
                       );

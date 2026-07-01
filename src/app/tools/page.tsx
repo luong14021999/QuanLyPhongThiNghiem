@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { toolsStore } from "@/lib/data/tools";
 import { AddToolDialog } from "@/components/tools/add-tool-dialog";
+import { EditToolDialog } from "@/components/tools/edit-tool-dialog";
 import { DeleteEntityButton } from "@/components/crud/delete-button";
 import { EntitySearchInput } from "@/components/crud/search-input";
 
@@ -246,11 +247,14 @@ export default async function ToolsPage({
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <DeleteEntityButton
-                            entity="tools"
-                            id={t.id}
-                            label={t.name}
-                          />
+                          <div className="flex items-center gap-0.5">
+                            <EditToolDialog row={t} />
+                            <DeleteEntityButton
+                              entity="tools"
+                              id={t.id}
+                              label={t.name}
+                            />
+                          </div>
                         </TableCell>
                       </TableRow>
                     );

@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { staffStore } from "@/lib/data/staff";
 import { AddStaffDialog } from "@/components/staff/add-staff-dialog";
+import { EditStaffDialog } from "@/components/staff/edit-staff-dialog";
 import { DeleteEntityButton } from "@/components/crud/delete-button";
 import { EntitySearchInput } from "@/components/crud/search-input";
 
@@ -205,11 +206,14 @@ export default async function PersonnelPage({
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <DeleteEntityButton
-                            entity="staff"
-                            id={s.id}
-                            label={s.fullName}
-                          />
+                          <div className="flex items-center gap-0.5">
+                            <EditStaffDialog row={s} />
+                            <DeleteEntityButton
+                              entity="staff"
+                              id={s.id}
+                              label={s.fullName}
+                            />
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
