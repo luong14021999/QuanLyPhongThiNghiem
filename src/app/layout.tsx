@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Sidebar } from "@/components/layout/sidebar";
 
 const inter = Inter({ subsets: ["latin", "vietnamese"] });
 
@@ -31,10 +30,7 @@ export default function RootLayout({
   return (
     <html lang="vi" className="h-full">
       <body className={`${inter.className} h-full antialiased`}>
-        <div className="flex h-screen w-screen overflow-hidden bg-muted/30">
-          <Sidebar />
-          <div className="flex-1 flex flex-col min-w-0">{children}</div>
-        </div>
+        {children}
       </body>
     </html>
   );

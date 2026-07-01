@@ -3,9 +3,9 @@
 import { usePathname } from "next/navigation";
 import {
   SidebarBrand,
-  SidebarFooter,
   SidebarNav,
 } from "@/components/layout/nav-config";
+import { SidebarUser } from "@/components/layout/sidebar-user";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -14,7 +14,7 @@ export function Sidebar() {
     <aside className="hidden md:flex md:flex-col w-64 shrink-0 bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
       <SidebarBrand />
       <SidebarNav pathname={pathname} />
-      <SidebarFooter />
+      <SidebarUser />
     </aside>
   );
 }

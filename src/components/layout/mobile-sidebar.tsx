@@ -6,9 +6,9 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Menu, X } from "lucide-react";
 import {
   SidebarBrand,
-  SidebarFooter,
   SidebarNav,
 } from "@/components/layout/nav-config";
+import { SidebarUser } from "@/components/layout/sidebar-user";
 
 export function MobileSidebar() {
   const [open, setOpen] = useState(false);
@@ -44,7 +44,7 @@ export function MobileSidebar() {
             </Dialog.Close>
           </div>
           <SidebarNav pathname={pathname} onNavigate={() => setOpen(false)} />
-          <SidebarFooter />
+          <SidebarUser />
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
