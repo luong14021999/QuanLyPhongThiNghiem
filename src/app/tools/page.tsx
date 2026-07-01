@@ -1,14 +1,18 @@
 import {
   TestTube,
   Filter,
-  Search,
-  Plus,
   CalendarClock,
   AlertTriangle,
   CheckCircle2,
   PackagePlus,
   ClipboardCheck,
 } from "lucide-react";
+import { toolsStore } from "@/lib/data/tools";
+import { AddToolDialog } from "@/components/tools/add-tool-dialog";
+import { DeleteEntityButton } from "@/components/crud/delete-button";
+import { EntitySearchInput } from "@/components/crud/search-input";
+
+export const dynamic = "force-dynamic";
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,14 +32,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { tools } from "@/lib/mock-data";
+import { type Tool } from "@/lib/mock-data";
 
-const statusVariant = {
+const statusVariant: Record<
+  Tool["status"],
+  "success" | "default" | "destructive" | "warning"
+> = {
   "Sẵn sàng": "success",
   "Đang dùng": "default",
   Hỏng: "destructive",
   "Chờ kiểm định": "warning",
-} as const;
+};
 
 function daysUntil(dateStr: string) {
   const diff =
@@ -44,44 +51,62 @@ function daysUntil(dateStr: string) {
   return Math.round(diff);
 }
 
-const categories = Array.from(new Set(tools.map((t) => t.category)));
+export default async function ToolsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q = "" } = await searchParams;
+  const all = await toolsStore.list();
+  const query = q.trim().toLowerCase();
+  const tools = query
+    ? all.filter(
+        (t) =>
+          t.code.toLowerCase().includes(query) ||
+          t.name.toLowerCase().includes(query) ||
+          t.category.toLowerCase().includes(query) ||
+          t.location.toLowerCase().includes(query) ||
+          t.spec.toLowerCase().includes(query),
+      )
+    : all;
 
-const stats = [
-  {
-    label: "Đầu mục dụng cụ",
-    value: tools.length,
-    icon: TestTube,
-    accent: "bg-emerald-50 text-emerald-700",
-  },
-  {
-    label: "Cần kiểm định",
-    value: tools.filter((t) => t.calibrationRequired).length,
-    icon: ClipboardCheck,
-    accent: "bg-blue-50 text-blue-600",
-  },
-  {
-    label: "Tồn dưới mức tối thiểu",
-    value: tools.filter((t) => t.qty < t.minQty).length,
-    icon: AlertTriangle,
-    accent: "bg-rose-50 text-rose-600",
-  },
-  {
-    label: "Sẵn sàng sử dụng",
-    value: tools.filter((t) => t.status === "Sẵn sàng").length,
-    icon: CheckCircle2,
-    accent: "bg-violet-50 text-violet-600",
-  },
-];
+  const categories = Array.from(new Set(all.map((t) => t.category)));
 
-const calibrationDue = tools
-  .filter((t) => t.calibrationRequired && t.nextCalibration)
-  .sort(
-    (a, b) =>
-      daysUntil(a.nextCalibration as string) -
-      daysUntil(b.nextCalibration as string),
-  );
+  const stats = [
+    {
+      label: "Đầu mục dụng cụ",
+      value: all.length,
+      icon: TestTube,
+      accent: "bg-emerald-50 text-emerald-700",
+    },
+    {
+      label: "Cần kiểm định",
+      value: all.filter((t) => t.calibrationRequired).length,
+      icon: ClipboardCheck,
+      accent: "bg-blue-50 text-blue-600",
+    },
+    {
+      label: "Tồn dưới mức tối thiểu",
+      value: all.filter((t) => t.qty < t.minQty).length,
+      icon: AlertTriangle,
+      accent: "bg-rose-50 text-rose-600",
+    },
+    {
+      label: "Sẵn sàng sử dụng",
+      value: all.filter((t) => t.status === "Sẵn sàng").length,
+      icon: CheckCircle2,
+      accent: "bg-violet-50 text-violet-600",
+    },
+  ];
 
-export default function ToolsPage() {
+  const calibrationDue = all
+    .filter((t) => t.calibrationRequired && t.nextCalibration)
+    .sort(
+      (a, b) =>
+        daysUntil(a.nextCalibration as string) -
+        daysUntil(b.nextCalibration as string),
+    );
+
   return (
     <>
       <Header
@@ -118,13 +143,10 @@ export default function ToolsPage() {
               </CardDescription>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-2 rounded-md border border-input bg-background px-2.5 h-9 text-sm w-full sm:w-56">
-                <Search className="w-4 h-4 text-muted-foreground" />
-                <input
-                  className="bg-transparent outline-none flex-1"
-                  placeholder="Tìm mã, tên dụng cụ..."
-                />
-              </div>
+              <EntitySearchInput
+                basePath="/tools"
+                placeholder="Tìm mã, tên dụng cụ..."
+              />
               <Button variant="outline" size="sm">
                 <Filter />
                 Lọc
@@ -133,10 +155,7 @@ export default function ToolsPage() {
                 <PackagePlus />
                 Nhập kho
               </Button>
-              <Button size="sm">
-                <Plus />
-                Thêm dụng cụ
-              </Button>
+              <AddToolDialog />
             </div>
           </CardHeader>
           <CardContent>
@@ -153,9 +172,22 @@ export default function ToolsPage() {
                     <TableHead>Vị trí</TableHead>
                     <TableHead>Kiểm định</TableHead>
                     <TableHead>Trạng thái</TableHead>
+                    <TableHead className="w-[60px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
+                  {tools.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={10}
+                        className="text-center text-sm text-muted-foreground py-8"
+                      >
+                        {query
+                          ? `Không có dụng cụ nào khớp "${query}"`
+                          : "Chưa có dụng cụ nào"}
+                      </TableCell>
+                    </TableRow>
+                  )}
                   {tools.map((t) => {
                     const lowStock = t.qty < t.minQty;
                     const stockPct = Math.min(
@@ -212,6 +244,13 @@ export default function ToolsPage() {
                           <Badge variant={statusVariant[t.status]}>
                             {t.status}
                           </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <DeleteEntityButton
+                            entity="tools"
+                            id={t.id}
+                            label={t.name}
+                          />
                         </TableCell>
                       </TableRow>
                     );

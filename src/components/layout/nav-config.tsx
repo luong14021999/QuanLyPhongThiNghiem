@@ -12,6 +12,7 @@ import {
   TestTube,
   Users2,
   Archive,
+  Thermometer,
   ShieldCheck,
   AlertOctagon,
   Scale,
@@ -36,13 +37,21 @@ export const navGroups: NavGroup[] = [
   {
     label: "Nghiệp vụ",
     items: [
-      { href: "/test-requests", label: "Phiếu yêu cầu thử nghiệm", icon: FileSignature },
       { href: "/campaigns", label: "Quan trắc theo đợt", icon: Telescope },
       { href: "/field", label: "Lấy mẫu hiện trường", icon: Smartphone },
       { href: "/samples", label: "Tiếp nhận mẫu", icon: ClipboardList },
       { href: "/analysis", label: "Quy trình phân tích", icon: FlaskConical },
-      { href: "/result-entry", label: "Nhập kết quả & duyệt", icon: ClipboardEdit },
-      { href: "/archive", label: "Kho mẫu lưu", icon: Archive },
+    ],
+  },
+  {
+    label: "Phiếu / Biểu mẫu",
+    items: [
+      { href: "/test-requests", label: "Phiếu yêu cầu thử nghiệm", icon: FileSignature },
+      { href: "/result-entry", label: "Phiếu diễn biến phân tích", icon: ClipboardEdit },
+      { href: "/reports", label: "Phiếu kết quả thử nghiệm", icon: FileText },
+      { href: "/environment", label: "Phiếu theo dõi môi trường", icon: Thermometer },
+      { href: "/archive", label: "Sổ theo dõi mẫu lưu", icon: Archive },
+      { href: "/feedback", label: "Phiếu ý kiến & khiếu nại", icon: MessageSquare },
     ],
   },
   {
@@ -67,13 +76,11 @@ export const navGroups: NavGroup[] = [
     items: [
       { href: "/customers", label: "Khách hàng", icon: Users2 },
       { href: "/services", label: "Dịch vụ & Tư vấn", icon: Briefcase },
-      { href: "/feedback", label: "Ý kiến & Khiếu nại", icon: MessageSquare },
     ],
   },
   {
     label: "Khác",
     items: [
-      { href: "/reports", label: "Báo cáo & Phiếu KQ", icon: FileText },
       { href: "/settings", label: "Cấu hình", icon: Settings },
     ],
   },

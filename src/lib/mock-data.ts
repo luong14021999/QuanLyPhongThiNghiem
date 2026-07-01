@@ -1000,6 +1000,7 @@ export type MaintenanceEntry = {
 export type EnvironmentReading = {
   id: string;
   room: string;
+  monitoringDevice: string; // AEMD-BM-10.02: "Thiết bị sử dụng để kiểm soát"
   parameter: "Nhiệt độ" | "Độ ẩm";
   value: number;
   unit: string;
@@ -1007,67 +1008,96 @@ export type EnvironmentReading = {
   recordedAt: string;
   observer: string;
   pass: boolean;
+  note?: string;
 };
 
+// Sinh 25 record cho phòng Đất & Phân bón × Nhiệt độ tháng 7/2026
+// (mô phỏng phiếu theo dõi hàng ngày AEMD-BM-10.02)
+const dailyReadingsSoilTemp: EnvironmentReading[] = [
+  22.5, 23.1, 22.8, 24.0, 23.5, 22.9, 23.7, 24.2, 23.0, 22.7,
+  23.4, 24.1, 25.3, 22.6, 23.9, 24.5, 23.2, 22.8, 24.7, 23.5,
+  22.9, 23.6, 24.0, 23.8, 22.5,
+].map((v, i) => ({
+  id: `evd-soil-t-${i + 1}`,
+  room: "P. Đất & Phân bón",
+  monitoringDevice: "Nhiệt kế Hanna HI-91410",
+  parameter: "Nhiệt độ" as const,
+  value: v,
+  unit: "°C",
+  limit: "20 – 25 °C",
+  recordedAt: `2026-07-${String(i + 1).padStart(2, "0")} 08:00`,
+  observer: i % 3 === 0 ? "Lê Văn Hùng" : i % 3 === 1 ? "Đỗ Minh Tuấn" : "Trần Thị Mai",
+  pass: v >= 20 && v <= 25,
+  note: v > 25 ? "Bật thêm điều hòa" : undefined,
+}));
+
 export const environmentReadings: EnvironmentReading[] = [
+  ...dailyReadingsSoilTemp,
   {
     id: "ev1",
     room: "P. Đất & Phân bón",
-    parameter: "Nhiệt độ",
-    value: 24.5,
-    unit: "°C",
-    limit: "20 – 25 °C",
-    recordedAt: "2026-05-20 08:00",
+    monitoringDevice: "Ẩm kế Testo 174H",
+    parameter: "Độ ẩm",
+    value: 58,
+    unit: "%RH",
+    limit: "≤ 65 %RH",
+    recordedAt: "2026-07-01 08:00",
     observer: "Lê Văn Hùng",
     pass: true,
   },
   {
     id: "ev2",
     room: "P. Đất & Phân bón",
+    monitoringDevice: "Ẩm kế Testo 174H",
     parameter: "Độ ẩm",
-    value: 58,
+    value: 62,
     unit: "%RH",
     limit: "≤ 65 %RH",
-    recordedAt: "2026-05-20 08:00",
+    recordedAt: "2026-07-05 08:00",
     observer: "Lê Văn Hùng",
     pass: true,
   },
   {
     id: "ev3",
     room: "P. Dư lượng BVTV",
+    monitoringDevice: "Nhiệt kế Hanna HI-91410",
     parameter: "Nhiệt độ",
     value: 22.8,
     unit: "°C",
     limit: "20 – 24 °C",
-    recordedAt: "2026-05-20 08:05",
+    recordedAt: "2026-07-15 08:05",
     observer: "Phạm Thu Hà",
     pass: true,
   },
   {
     id: "ev4",
     room: "P. Dư lượng BVTV",
+    monitoringDevice: "Ẩm kế Testo 174H",
     parameter: "Độ ẩm",
     value: 67,
     unit: "%RH",
     limit: "≤ 60 %RH",
-    recordedAt: "2026-05-20 08:05",
+    recordedAt: "2026-07-15 08:05",
     observer: "Phạm Thu Hà",
     pass: false,
+    note: "Vượt 7% – bật hút ẩm; xin ý kiến Trưởng phòng",
   },
   {
     id: "ev5",
     room: "Kho hóa chất",
+    monitoringDevice: "Nhiệt kế cầm tay Hanna",
     parameter: "Nhiệt độ",
     value: 26.0,
     unit: "°C",
     limit: "≤ 28 °C",
-    recordedAt: "2026-05-20 08:10",
+    recordedAt: "2026-07-20 08:10",
     observer: "Hoàng Thị Linh",
     pass: true,
   },
   {
     id: "ev6",
     room: "Tủ chuẩn lạnh",
+    monitoringDevice: "Data logger Elitech RC-4",
     parameter: "Nhiệt độ",
     value: 3.4,
     unit: "°C",

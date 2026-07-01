@@ -162,6 +162,7 @@ async function seedEquipment() {
   await supabase.from("environment_readings").insert(
     environmentReadings.map((r) => ({
       room: r.room,
+      monitoring_device: r.monitoringDevice,
       parameter: r.parameter,
       value: r.value,
       unit: r.unit,
@@ -169,6 +170,7 @@ async function seedEquipment() {
       recorded_at: r.recordedAt,
       observer: r.observer,
       pass: r.pass,
+      note: r.note ?? null,
     })),
   );
   console.log(`✓ environment_readings: ${environmentReadings.length}`);
