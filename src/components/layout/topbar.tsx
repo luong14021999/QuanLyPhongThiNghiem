@@ -33,7 +33,7 @@ export function TopBar() {
         href="/"
         className="relative z-10 flex items-center gap-2.5 sm:gap-3.5 min-w-0 group"
       >
-        <div className="w-11 h-11 sm:w-16 sm:h-16 rounded-full bg-white ring-2 ring-white/50 shadow-lg flex items-center justify-center overflow-hidden shrink-0 transition-transform group-hover:scale-105">
+        <div className="w-11 h-11 sm:w-16 sm:h-16 rounded-full bg-white ring-2 ring-white/50 shadow-lg flex items-center justify-center overflow-hidden shrink-0 transition-transform sm:group-hover:scale-105">
           <Image
             src="/logo-vnnth.png"
             alt="Viện Nông Nghiệp Thanh Hóa"

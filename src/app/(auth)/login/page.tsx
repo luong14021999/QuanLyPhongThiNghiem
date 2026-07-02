@@ -17,7 +17,7 @@ export const metadata = {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-[100dvh] flex">
       {/* LEFT: form panel */}
       <div className="flex-1 lg:max-w-[560px] flex flex-col justify-center px-6 sm:px-12 py-10 bg-background">
         <div className="w-full max-w-sm mx-auto">

@@ -103,6 +103,16 @@
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* Không nhảy màu/khung khi chạm trên mobile */
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* iOS chỉ auto-zoom khi field < 16px → ép 16px trên mobile để không "nhảy" layout khi chạm */
+  @media (max-width: 640px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px;
+    }
   }
 }
 
