@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Image from "next/image";
 import {
   Sprout,
@@ -52,7 +53,9 @@ export default function LoginPage() {
           </p>
 
           <div className="mt-8">
-            <LoginForm />
+            <Suspense fallback={<div className="h-[280px]" />}>
+              <LoginForm />
+            </Suspense>
           </div>
 
           <div className="mt-10 pt-6 border-t border-border">
