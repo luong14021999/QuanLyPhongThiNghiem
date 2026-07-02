@@ -99,23 +99,6 @@ export function LoginForm() {
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-sm">
-        <label className="flex items-center gap-2 text-muted-foreground">
-          <input
-            type="checkbox"
-            className="rounded border-input"
-            defaultChecked
-          />
-          Ghi nhớ đăng nhập
-        </label>
-        <button
-          type="button"
-          className="text-primary font-medium hover:underline"
-        >
-          Quên mật khẩu?
-        </button>
-      </div>
-
       {error && (
         <div className="flex items-start gap-2 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 px-3.5 py-2.5 text-sm">
           <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />

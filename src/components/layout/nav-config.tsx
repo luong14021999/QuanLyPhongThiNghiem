@@ -35,6 +35,15 @@ export const navGroups: NavGroup[] = [
     items: [{ href: "/", label: "Bảng điều khiển", icon: LayoutDashboard }],
   },
   {
+    label: "Nguồn lực",
+    items: [
+      { href: "/personnel", label: "Nhân sự PTN", icon: Users },
+      { href: "/equipment", label: "Thiết bị PTN", icon: Wrench },
+      { href: "/tools", label: "Dụng cụ", icon: TestTube },
+      { href: "/chemicals", label: "Hóa chất – Vật tư", icon: Beaker },
+    ],
+  },
+  {
     label: "Nghiệp vụ",
     items: [
       { href: "/campaigns", label: "Quan trắc theo đợt", icon: Telescope },
@@ -60,15 +69,6 @@ export const navGroups: NavGroup[] = [
       { href: "/qc", label: "QC Levey-Jennings", icon: ShieldCheck },
       { href: "/risks", label: "Đăng ký rủi ro", icon: AlertOctagon },
       { href: "/decision-rules", label: "Quy tắc quyết định", icon: Scale },
-    ],
-  },
-  {
-    label: "Nguồn lực",
-    items: [
-      { href: "/personnel", label: "Nhân sự PTN", icon: Users },
-      { href: "/equipment", label: "Thiết bị PTN", icon: Wrench },
-      { href: "/tools", label: "Dụng cụ", icon: TestTube },
-      { href: "/chemicals", label: "Hóa chất – Vật tư", icon: Beaker },
     ],
   },
   {

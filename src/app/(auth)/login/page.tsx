@@ -21,22 +21,22 @@ export default function LoginPage() {
       {/* LEFT: form panel */}
       <div className="flex-1 lg:max-w-[560px] flex flex-col justify-center px-6 sm:px-12 py-10 bg-background">
         <div className="w-full max-w-sm mx-auto">
-          <div className="flex items-center gap-3 mb-10">
-            <div className="w-11 h-11 rounded-full bg-white ring-1 ring-primary/20 flex items-center justify-center shrink-0 overflow-hidden">
+          <div className="flex flex-col items-center text-center gap-4 mb-10">
+            <div className="w-40 h-40 rounded-full bg-white ring-1 ring-primary/20 flex items-center justify-center shrink-0 overflow-hidden">
               <Image
                 src="/logo-vnnth.png"
                 alt="Viện Nông Nghiệp Thanh Hóa"
-                width={44}
-                height={44}
-                className="w-11 h-11 object-contain"
+                width={160}
+                height={160}
+                className="w-40 h-40 object-contain"
                 priority
               />
             </div>
             <div className="leading-tight">
-              <div className="text-sm font-bold text-foreground">
+              <div className="text-xl font-bold text-foreground">
                 Viện Nông Nghiệp Thanh Hóa
               </div>
-              <div className="text-[11px] text-muted-foreground">
+              <div className="text-sm text-muted-foreground">
                 Phòng Phân tích và Thí nghiệm
               </div>
             </div>
@@ -48,7 +48,7 @@ export default function LoginPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Chưa có tài khoản?{" "}
             <span className="text-primary font-medium">
-              Liên hệ QTV để được cấp
+              Liên hệ trưởng phòng để được cấp
             </span>
           </p>
 

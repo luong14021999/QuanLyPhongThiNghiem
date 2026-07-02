@@ -62,11 +62,11 @@
   --input: 145 18% 88%;
   --ring: 145 62% 32%;
   --radius: 0.625rem;
-  --sidebar: 150 40% 12%;
-  --sidebar-foreground: 140 25% 92%;
-  --sidebar-accent: 150 30% 18%;
-  --sidebar-accent-foreground: 140 30% 98%;
-  --sidebar-border: 150 30% 18%;
+  --sidebar: 147 55% 26%;
+  --sidebar-foreground: 140 35% 92%;
+  --sidebar-accent: 145 50% 34%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 147 45% 21%;
 }
 
 .dark {

@@ -1,6 +1,5 @@
 import { Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { MobileSidebar } from "@/components/layout/mobile-sidebar";
 
 type HeaderProps = {
   title: string;
@@ -10,7 +9,6 @@ type HeaderProps = {
 export function Header({ title, description }: HeaderProps) {
   return (
     <header className="h-14 sm:h-16 shrink-0 border-b border-border bg-card/60 backdrop-blur supports-[backdrop-filter]:bg-card/60 px-3 sm:px-6 flex items-center gap-3 sm:gap-4">
-      <MobileSidebar />
       <div className="min-w-0 flex-1">
         <h1 className="text-sm sm:text-lg font-semibold truncate">{title}</h1>
         {description && (
