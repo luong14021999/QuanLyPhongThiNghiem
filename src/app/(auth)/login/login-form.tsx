@@ -60,7 +60,6 @@ export function LoginForm() {
           required
           disabled={loading}
           className="block w-full h-11 rounded-lg border border-input bg-background px-3.5 text-sm shadow-sm placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-60"
-          placeholder="ten.ban@vnnth.gov.vn"
         />
       </div>
 
@@ -81,7 +80,6 @@ export function LoginForm() {
             required
             disabled={loading}
             className="block w-full h-11 rounded-lg border border-input bg-background px-3.5 pr-10 text-sm shadow-sm placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-60"
-            placeholder="••••••••"
           />
           <button
             type="button"
