@@ -18,6 +18,13 @@ export const POST = createRoute<Equipment>(
     nextCalibration: body.nextCalibration ?? "",
     status: body.status ?? "Hoạt động",
     usageHours: body.usageHours ?? 0,
+    serial: body.serial ?? "",
+    manufacturer: body.manufacturer ?? "",
+    commissionedAt: body.commissionedAt ?? "",
+    calibrationFreq: body.calibrationFreq ?? "",
+    calibrationPlace: body.calibrationPlace ?? "",
+    inspectionFreq: body.inspectionFreq ?? "",
+    inspectionPlace: body.inspectionPlace ?? "",
   }),
   (body) => {
     if (!body.code) return "Thiếu mã thiết bị";

@@ -39,8 +39,8 @@ export const navGroups: NavGroup[] = [
     items: [
       { href: "/personnel", label: "Nhân sự PTN", icon: Users },
       { href: "/equipment", label: "Thiết bị PTN", icon: Wrench },
-      { href: "/tools", label: "Dụng cụ", icon: TestTube },
-      { href: "/chemicals", label: "Hóa chất – Vật tư", icon: Beaker },
+      { href: "/tools", label: "Dụng cụ – Vật tư", icon: TestTube },
+      { href: "/chemicals", label: "Hóa chất", icon: Beaker },
     ],
   },
   {

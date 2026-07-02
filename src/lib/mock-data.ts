@@ -183,6 +183,13 @@ export type Equipment = {
   nextCalibration: string;
   status: "Hoạt động" | "Hiệu chuẩn" | "Bảo trì" | "Ngừng";
   usageHours: number;
+  serial?: string; // Số serial/model
+  manufacturer?: string; // Nhà sản xuất
+  commissionedAt?: string; // Ngày vận hành
+  calibrationFreq?: string; // Tần suất hiệu chuẩn
+  calibrationPlace?: string; // Nơi thực hiện hiệu chuẩn
+  inspectionFreq?: string; // Tần suất kiểm tra/bảo kiểm
+  inspectionPlace?: string; // Nơi thực hiện kiểm tra/bảo kiểm
 };
 
 export const equipments: Equipment[] = [
@@ -632,12 +639,15 @@ export type ChemicalUsageLog = {
   id: string;
   chemicalCode: string;
   chemicalName: string;
+  category?: string; // Chủng loại (hóa chất / chất chuẩn / dung môi...)
   qty: number;
   unit: string;
   sampleCode: string;
   method: string;
-  technician: string;
-  usedAt: string;
+  technician: string; // Người sử dụng
+  usedAt: string; // Ngày xuất
+  remaining?: number; // Khối lượng dư
+  purpose?: string; // Mục đích sử dụng
 };
 
 export const chemicalUsageLogs: ChemicalUsageLog[] = [
@@ -3467,3 +3477,258 @@ export const dashboardKpis = {
     (c) => new Date(c.expiry) <= new Date("2026-08-31"),
   ).length,
 };
+
+// ===== Nhật ký hiệu chuẩn thiết bị =====
+export type CalibrationLog = {
+  id: string;
+  equipmentCode: string;
+  equipmentName: string;
+  date: string; // Ngày hiệu chuẩn
+  result: "Đạt" | "Không đạt";
+  certificate: string; // Số giấy chứng nhận
+  place: string; // Nơi thực hiện
+  nextDate: string; // Hạn kế tiếp
+  technician: string; // Người theo dõi
+  note?: string;
+};
+
+export const calibrationLogs: CalibrationLog[] = [
+  {
+    id: "cal1",
+    equipmentCode: "TB-ICP-01",
+    equipmentName: "ICP-MS",
+    date: "2026-04-02",
+    result: "Đạt",
+    certificate: "HC-2026-0412",
+    place: "PerkinElmer VN",
+    nextDate: "2026-10-02",
+    technician: "Nguyễn Quang Anh",
+  },
+  {
+    id: "cal2",
+    equipmentCode: "TB-AAS-01",
+    equipmentName: "AAS",
+    date: "2026-02-10",
+    result: "Đạt",
+    certificate: "HC-2026-0210",
+    place: "QUATEST 1",
+    nextDate: "2026-08-10",
+    technician: "Đỗ Minh Tuấn",
+  },
+];
+
+// ===== Nhật ký bảo trì, bảo dưỡng thiết bị =====
+export type MaintenanceLog = {
+  id: string;
+  equipmentCode: string;
+  equipmentName: string;
+  date: string;
+  kind: "Bảo trì định kỳ" | "Bảo dưỡng" | "Sửa chữa";
+  content: string; // Nội dung thực hiện
+  vendor: string; // Đơn vị thực hiện
+  technician: string; // Người theo dõi
+  note?: string;
+};
+
+export const maintenanceLogs: MaintenanceLog[] = [
+  {
+    id: "mt1",
+    equipmentCode: "TB-GCMS-01",
+    equipmentName: "GC-MS dư lượng BVTV",
+    date: "2026-05-05",
+    kind: "Bảo dưỡng",
+    content: "Vệ sinh nguồn ion, thay bơm chân không",
+    vendor: "Agilent VN",
+    technician: "Phạm Thu Hà",
+  },
+  {
+    id: "mt2",
+    equipmentCode: "TB-AUTO-01",
+    equipmentName: "Máy chuẩn độ tự động",
+    date: "2026-04-18",
+    kind: "Bảo trì định kỳ",
+    content: "Kiểm tra buret, thay điện cực",
+    vendor: "Metrohm – đại lý KV2",
+    technician: "Lê Văn Hùng",
+  },
+];
+
+// ===== Biên bản kiểm tra/kiểm định thiết bị =====
+export type InspectionRecord = {
+  id: string;
+  equipmentCode: string;
+  equipmentName: string;
+  date: string;
+  type: "Kiểm tra" | "Kiểm định";
+  result: "Đạt" | "Không đạt";
+  conclusion: string; // Kết luận
+  inspector: string; // Người/đơn vị kiểm định
+  note?: string;
+};
+
+export const inspectionRecords: InspectionRecord[] = [
+  {
+    id: "ins1",
+    equipmentCode: "TB-AAS-01",
+    equipmentName: "AAS",
+    date: "2026-02-11",
+    type: "Kiểm định",
+    result: "Đạt",
+    conclusion: "Thiết bị đạt yêu cầu sử dụng",
+    inspector: "QUATEST 1",
+  },
+  {
+    id: "ins2",
+    equipmentCode: "TB-KJ-01",
+    equipmentName: "Hệ Kjeldahl",
+    date: "2026-03-20",
+    type: "Kiểm tra",
+    result: "Đạt",
+    conclusion: "Hoạt động ổn định sau vệ sinh",
+    inspector: "Nội bộ – Tổ thiết bị",
+  },
+];
+
+// ===== Hướng dẫn sử dụng thiết bị =====
+export type EquipmentManual = {
+  id: string;
+  equipmentCode: string;
+  equipmentName: string;
+  title: string; // Tên tài liệu
+  docCode: string; // Mã tài liệu
+  version: string;
+  fileUrl?: string; // Link tài liệu
+  note?: string;
+};
+
+export const equipmentManuals: EquipmentManual[] = [
+  {
+    id: "man1",
+    equipmentCode: "TB-ICP-01",
+    equipmentName: "ICP-MS",
+    title: "Hướng dẫn vận hành ICP-MS NexION 2000",
+    docCode: "HDSD-ICP-01",
+    version: "v2.0",
+    fileUrl: "",
+  },
+  {
+    id: "man2",
+    equipmentCode: "TB-AAS-01",
+    equipmentName: "AAS",
+    title: "Hướng dẫn sử dụng máy AAS 240FS",
+    docCode: "HDSD-AAS-01",
+    version: "v1.3",
+    fileUrl: "",
+  },
+];
+
+// ===== Hồ sơ hóa chất, chất chuẩn (CoA / MSDS / chứng nhận) =====
+export type ChemicalProfile = {
+  id: string;
+  chemicalCode: string;
+  chemicalName: string;
+  docType: "CoA" | "MSDS" | "Chứng nhận" | "Khác";
+  docCode: string;
+  issuedBy: string; // Đơn vị cấp
+  issueDate: string;
+  fileUrl?: string;
+  note?: string;
+};
+
+export const chemicalProfiles: ChemicalProfile[] = [
+  {
+    id: "cp1",
+    chemicalCode: "HC-STD-Pb1000",
+    chemicalName: "Chuẩn Pb 1000 mg/L",
+    docType: "CoA",
+    docCode: "CoA-Pb-2026-01",
+    issuedBy: "Merck",
+    issueDate: "2026-01-15",
+    fileUrl: "",
+  },
+  {
+    id: "cp2",
+    chemicalCode: "HC-ACN-01",
+    chemicalName: "Acetonitrile (ACN) HPLC",
+    docType: "MSDS",
+    docCode: "MSDS-ACN-2025",
+    issuedBy: "Fisher",
+    issueDate: "2025-06-01",
+    fileUrl: "",
+  },
+];
+
+// ===== Vật tư tiêu hao (danh mục riêng, đi cùng Dụng cụ) =====
+export type Supply = {
+  id: string;
+  code: string;
+  name: string;
+  unit: string;
+  qty: number;
+  minQty: number;
+  location: string;
+  note?: string;
+};
+
+export const supplies: Supply[] = [
+  {
+    id: "vt1",
+    code: "VT-GLOVE-01",
+    name: "Găng tay nitrile không bột",
+    unit: "hộp",
+    qty: 42,
+    minQty: 10,
+    location: "Kho vật tư",
+  },
+  {
+    id: "vt2",
+    code: "VT-FILTER-045",
+    name: "Màng lọc PTFE 0.45 µm",
+    unit: "gói",
+    qty: 8,
+    minQty: 5,
+    location: "Kho vật tư",
+  },
+  {
+    id: "vt3",
+    code: "VT-VIAL-2ML",
+    name: "Vial HPLC 2 mL nắp vặn",
+    unit: "hộp",
+    qty: 15,
+    minQty: 6,
+    location: "P. Sắc ký",
+  },
+];
+
+// ===== Nhật ký theo dõi sử dụng dụng cụ, vật tư tiêu hao =====
+export type ToolUsageLog = {
+  id: string;
+  itemName: string; // Tên dụng cụ / vật tư
+  qty: number; // Số lượng
+  unit?: string;
+  importedAt: string; // Ngày nhập
+  status: string; // Tình trạng sử dụng
+  user?: string; // Người sử dụng
+  note?: string;
+};
+
+export const toolUsageLogs: ToolUsageLog[] = [
+  {
+    id: "tu1",
+    itemName: "Pipet tự động 1000 µL",
+    qty: 1,
+    unit: "cái",
+    importedAt: "2026-03-01",
+    status: "Đang dùng tốt",
+    user: "Phạm Thu Hà",
+  },
+  {
+    id: "tu2",
+    itemName: "Màng lọc PTFE 0.45 µm",
+    qty: 2,
+    unit: "gói",
+    importedAt: "2026-05-10",
+    status: "Đã dùng hết",
+    user: "Lê Văn Hùng",
+  },
+];

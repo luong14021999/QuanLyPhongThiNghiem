@@ -3,14 +3,10 @@ import {
   CalendarClock,
   AlertTriangle,
   CheckCircle2,
-  Filter,
-  ScrollText,
-  Thermometer,
-  Droplets,
-  History,
+  ExternalLink,
 } from "lucide-react";
 import { Header } from "@/components/layout/header";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -18,7 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -27,16 +22,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  maintenanceSchedule,
-  equipmentUsageLogs,
-  environmentReadings,
-} from "@/lib/mock-data";
 import { equipmentStore } from "@/lib/data/equipment";
-import { AddEquipmentDialog } from "@/components/equipment/add-equipment-dialog";
-import { EditEquipmentDialog } from "@/components/equipment/edit-equipment-dialog";
+import { equipmentUsageLogStore } from "@/lib/data/equipment-usage-logs";
+import { calibrationLogStore } from "@/lib/data/calibration-logs";
+import { maintenanceLogStore } from "@/lib/data/maintenance-logs";
+import { inspectionRecordStore } from "@/lib/data/inspection-records";
+import { equipmentManualStore } from "@/lib/data/equipment-manuals";
 import { DeleteEntityButton } from "@/components/crud/delete-button";
 import { EntitySearchInput } from "@/components/crud/search-input";
+import {
+  EntityFormDialog,
+  type CrudField,
+} from "@/components/crud/entity-form-dialog";
+import { CrudTableCard } from "@/components/crud/crud-table-card";
 
 export const dynamic = "force-dynamic";
 
@@ -59,6 +57,89 @@ function daysUntil(dateStr: string) {
   return Math.round(diff);
 }
 
+// ===== Field schemas =====
+const EQUIPMENT_FIELDS: CrudField[] = [
+  { name: "code", label: "Mã thiết bị", required: true, mono: true },
+  {
+    name: "status",
+    label: "Trạng thái",
+    type: "select",
+    options: ["Hoạt động", "Hiệu chuẩn", "Bảo trì", "Ngừng"],
+  },
+  { name: "name", label: "Tên thiết bị", required: true, full: true },
+  { name: "model", label: "Model" },
+  { name: "serial", label: "Số serial" },
+  { name: "manufacturer", label: "Nhà sản xuất" },
+  { name: "location", label: "Vị trí" },
+  { name: "commissionedAt", label: "Ngày vận hành", type: "date" },
+  { name: "usageHours", label: "Giờ chạy", type: "number" },
+  { name: "lastCalibration", label: "Hiệu chuẩn gần nhất", type: "date" },
+  { name: "nextCalibration", label: "Hiệu chuẩn kế tiếp", type: "date" },
+  { name: "calibrationFreq", label: "Tần suất hiệu chuẩn" },
+  { name: "calibrationPlace", label: "Nơi hiệu chuẩn" },
+  { name: "inspectionFreq", label: "Tần suất kiểm tra/bảo kiểm" },
+  { name: "inspectionPlace", label: "Nơi kiểm tra/bảo kiểm" },
+];
+
+const USAGE_FIELDS: CrudField[] = [
+  { name: "equipmentCode", label: "Mã thiết bị", required: true, mono: true },
+  { name: "equipmentName", label: "Tên thiết bị" },
+  { name: "technician", label: "KTV / Người dùng" },
+  { name: "sampleCode", label: "Mẫu", mono: true },
+  { name: "startedAt", label: "Bắt đầu", type: "datetime-local" },
+  { name: "durationMin", label: "Thời lượng (phút)", type: "number" },
+];
+
+const CALIBRATION_FIELDS: CrudField[] = [
+  { name: "equipmentCode", label: "Mã thiết bị", required: true, mono: true },
+  { name: "equipmentName", label: "Tên thiết bị" },
+  { name: "date", label: "Ngày hiệu chuẩn", type: "date" },
+  { name: "result", label: "Kết quả", type: "select", options: ["Đạt", "Không đạt"] },
+  { name: "certificate", label: "Số giấy chứng nhận" },
+  { name: "place", label: "Nơi thực hiện" },
+  { name: "nextDate", label: "Hạn kế tiếp", type: "date" },
+  { name: "technician", label: "Người theo dõi" },
+  { name: "note", label: "Ghi chú", full: true },
+];
+
+const MAINTENANCE_FIELDS: CrudField[] = [
+  { name: "equipmentCode", label: "Mã thiết bị", required: true, mono: true },
+  { name: "equipmentName", label: "Tên thiết bị" },
+  { name: "date", label: "Ngày thực hiện", type: "date" },
+  {
+    name: "kind",
+    label: "Loại",
+    type: "select",
+    options: ["Bảo trì định kỳ", "Bảo dưỡng", "Sửa chữa"],
+  },
+  { name: "content", label: "Nội dung", full: true },
+  { name: "vendor", label: "Đơn vị thực hiện" },
+  { name: "technician", label: "Người theo dõi" },
+  { name: "note", label: "Ghi chú", full: true },
+];
+
+const INSPECTION_FIELDS: CrudField[] = [
+  { name: "equipmentCode", label: "Mã thiết bị", required: true, mono: true },
+  { name: "equipmentName", label: "Tên thiết bị" },
+  { name: "date", label: "Ngày", type: "date" },
+  { name: "type", label: "Loại", type: "select", options: ["Kiểm tra", "Kiểm định"] },
+  { name: "result", label: "Kết quả", type: "select", options: ["Đạt", "Không đạt"] },
+  { name: "conclusion", label: "Kết luận", full: true },
+  { name: "inspector", label: "Người/đơn vị kiểm định" },
+  { name: "note", label: "Ghi chú", full: true },
+];
+
+const MANUAL_FIELDS: CrudField[] = [
+  { name: "equipmentCode", label: "Mã thiết bị", required: true, mono: true },
+  { name: "equipmentName", label: "Tên thiết bị" },
+  { name: "title", label: "Tên tài liệu", required: true, full: true },
+  { name: "docCode", label: "Mã tài liệu", mono: true },
+  { name: "version", label: "Phiên bản" },
+  { name: "fileUrl", label: "Link tài liệu", full: true },
+  { name: "note", label: "Ghi chú", full: true },
+];
+
+
 export default async function EquipmentPage({
   searchParams,
 }: {
@@ -77,6 +158,15 @@ export default async function EquipmentPage({
       )
     : all;
 
+  const [usageLogs, calibrationLogs, maintenanceLogs, inspectionRecords, manuals] =
+    await Promise.all([
+      equipmentUsageLogStore.list(),
+      calibrationLogStore.list(),
+      maintenanceLogStore.list(),
+      inspectionRecordStore.list(),
+      equipmentManualStore.list(),
+    ]);
+
   const stats = [
     {
       label: "Thiết bị đang hoạt động",
@@ -86,9 +176,8 @@ export default async function EquipmentPage({
     },
     {
       label: "Đang hiệu chuẩn / bảo trì",
-      value: all.filter((e) =>
-        ["Hiệu chuẩn", "Bảo trì"].includes(e.status),
-      ).length,
+      value: all.filter((e) => ["Hiệu chuẩn", "Bảo trì"].includes(e.status))
+        .length,
       icon: Wrench,
       accent: "bg-amber-50 text-amber-600",
     },
@@ -110,7 +199,7 @@ export default async function EquipmentPage({
     <>
       <Header
         title="Quản lý thiết bị phòng thí nghiệm"
-        description="Danh mục thiết bị, lịch hiệu chuẩn – bảo trì, nhật ký sử dụng và cảnh báo kiểm định"
+        description="Danh mục thiết bị, hiệu chuẩn – bảo trì, nhật ký sử dụng, biên bản kiểm định và hướng dẫn sử dụng"
       />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 scrollbar-thin">
         <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -133,13 +222,15 @@ export default async function EquipmentPage({
           ))}
         </section>
 
+        {/* 1. Danh mục thiết bị */}
         <section>
           <Card>
             <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between space-y-0">
               <div>
                 <CardTitle>Danh mục thiết bị</CardTitle>
                 <CardDescription>
-                  Mã thiết bị, vị trí đặt, lịch hiệu chuẩn và giờ sử dụng
+                  Mã, serial/model, nhà sản xuất, ngày vận hành, tần suất và lịch
+                  hiệu chuẩn / kiểm định
                 </CardDescription>
               </div>
               <div className="flex flex-wrap items-center gap-2">
@@ -147,34 +238,44 @@ export default async function EquipmentPage({
                   basePath="/equipment"
                   placeholder="Tìm theo mã, tên..."
                 />
-                <Button variant="outline" size="sm">
-                  <Filter />
-                  Lọc
-                </Button>
-                <AddEquipmentDialog />
+                <EntityFormDialog
+                  mode="add"
+                  endpoint="/api/equipment"
+                  title="Thêm thiết bị mới"
+                  addLabel="Thêm thiết bị"
+                  fields={EQUIPMENT_FIELDS}
+                  submitLabel="Lưu thiết bị"
+                />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="rounded-lg border">
+              <div className="rounded-xl border overflow-hidden">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-muted/40">
-                      <TableHead>Mã</TableHead>
-                      <TableHead>Tên thiết bị</TableHead>
-                      <TableHead>Model</TableHead>
-                      <TableHead>Vị trí</TableHead>
-                      <TableHead>HC gần nhất</TableHead>
-                      <TableHead>HC kế tiếp</TableHead>
-                      <TableHead>Giờ chạy</TableHead>
-                      <TableHead>Trạng thái</TableHead>
-                      <TableHead className="w-[160px]"></TableHead>
+                    <TableRow className="bg-muted/50 hover:bg-muted/50 border-0">
+                      <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Thiết bị
+                      </TableHead>
+                      <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Nhà SX / Serial
+                      </TableHead>
+                      <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Vị trí
+                      </TableHead>
+                      <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Hiệu chuẩn (gần / kế tiếp)
+                      </TableHead>
+                      <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Trạng thái
+                      </TableHead>
+                      <TableHead className="w-[160px]" />
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {equipments.length === 0 && (
                       <TableRow>
                         <TableCell
-                          colSpan={9}
+                          colSpan={6}
                           className="text-center text-sm text-muted-foreground py-8"
                         >
                           {query
@@ -188,20 +289,29 @@ export default async function EquipmentPage({
                       const dueSoon = days <= 30 && days >= 0;
                       const overdue = days < 0;
                       return (
-                        <TableRow key={e.id}>
-                          <TableCell className="font-mono">{e.code}</TableCell>
-                          <TableCell className="font-medium">
-                            {e.name}
+                        <TableRow
+                          key={e.id}
+                          className="hover:bg-primary/[0.04] transition-colors"
+                        >
+                          <TableCell>
+                            <div className="font-medium">{e.name}</div>
+                            <div className="text-xs text-muted-foreground font-mono">
+                              {e.code}
+                              {e.model ? ` · ${e.model}` : ""}
+                            </div>
                           </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {e.model}
+                          <TableCell className="text-sm">
+                            <div>{e.manufacturer || "—"}</div>
+                            <div className="text-xs text-muted-foreground font-mono">
+                              {e.serial || ""}
+                            </div>
                           </TableCell>
                           <TableCell>{e.location}</TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {e.lastCalibration}
-                          </TableCell>
                           <TableCell>
-                            <div className="flex items-center gap-2">
+                            <div className="text-xs text-muted-foreground">
+                              {e.lastCalibration || "—"}
+                            </div>
+                            <div className="flex items-center gap-1.5">
                               <span
                                 className={
                                   overdue
@@ -211,7 +321,7 @@ export default async function EquipmentPage({
                                       : ""
                                 }
                               >
-                                {e.nextCalibration}
+                                {e.nextCalibration || "—"}
                               </span>
                               {(dueSoon || overdue) && (
                                 <AlertTriangle
@@ -220,17 +330,22 @@ export default async function EquipmentPage({
                               )}
                             </div>
                           </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {e.usageHours.toLocaleString("vi-VN")} h
-                          </TableCell>
                           <TableCell>
                             <Badge variant={statusVariant[e.status]}>
                               {e.status}
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <div className="flex items-center gap-1.5">
-                              <EditEquipmentDialog row={e} />
+                            <div className="flex items-center justify-end gap-1.5">
+                              <EntityFormDialog
+                                mode="edit"
+                                endpoint="/api/equipment"
+                                id={e.id}
+                                title="Sửa thiết bị"
+                                fields={EQUIPMENT_FIELDS}
+                                initial={e}
+                                submitLabel="Lưu thay đổi"
+                              />
                               <DeleteEntityButton
                                 entity="equipment"
                                 id={e.id}
@@ -248,245 +363,239 @@ export default async function EquipmentPage({
           </Card>
         </section>
 
-        <section>
-          <Card>
-            <CardHeader>
-              <CardTitle>Lịch hiệu chuẩn / bảo trì</CardTitle>
-              <CardDescription>
-                Sắp xếp theo ngày kế tiếp – đồng bộ với nhà cung cấp
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                {maintenanceSchedule.slice(0, 5).map((m) => {
-                  const days = daysUntil(m.scheduledAt);
-                  return (
-                    <li
-                      key={m.id}
-                      className="flex items-center gap-3 p-3 rounded-md border bg-card"
-                    >
-                      <CalendarClock className="w-4 h-4 text-muted-foreground shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate">
-                          {m.equipmentName}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {m.equipmentCode} · {m.kind} · {m.vendor}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-xs text-muted-foreground">
-                          {m.scheduledAt}
-                        </div>
-                        <div
-                          className={`text-xs font-medium ${
-                            days < 0
-                              ? "text-destructive"
-                              : days <= 30
-                                ? "text-warning"
-                                : "text-muted-foreground"
-                          }`}
-                        >
-                          {days < 0
-                            ? `Quá ${Math.abs(days)} ngày`
-                            : `Còn ${days} ngày`}
-                        </div>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            </CardContent>
-          </Card>
-        </section>
+        {/* 4. Nhật ký sử dụng thiết bị */}
+        <CrudTableCard
+          title="Nhật ký sử dụng thiết bị"
+          description="Logbook: người dùng, mẫu liên quan và thời lượng vận hành"
+          endpoint="/api/equipment-usage-logs"
+          entity="equipment-usage-logs"
+          editFields={USAGE_FIELDS}
+          addNode={
+            <EntityFormDialog
+              mode="add"
+              endpoint="/api/equipment-usage-logs"
+              title="Thêm nhật ký sử dụng"
+              addLabel="Thêm nhật ký"
+              fields={USAGE_FIELDS}
+              submitLabel="Lưu"
+            />
+          }
+          headers={["Thiết bị", "KTV", "Mẫu", "Bắt đầu", "Thời lượng"]}
+          rows={usageLogs.map((u) => ({
+            id: u.id,
+            label: u.equipmentName || u.equipmentCode,
+            initial: u,
+            cells: [
+              <div key="tb">
+                <div className="font-medium text-sm">{u.equipmentName}</div>
+                <div className="text-xs text-muted-foreground font-mono">
+                  {u.equipmentCode}
+                </div>
+              </div>,
+              u.technician,
+              <span key="mau" className="font-mono text-xs">
+                {u.sampleCode}
+              </span>,
+              <span key="bd" className="text-muted-foreground text-xs">
+                {u.startedAt}
+              </span>,
+              <span key="tl" className="text-xs">
+                {u.durationMin} phút
+              </span>,
+            ],
+          }))}
+        />
 
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Nhật ký sử dụng thiết bị</CardTitle>
-              <CardDescription>
-                Logbook ghi nhận người dùng, mẫu liên quan và thời lượng vận
-                hành
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-lg border">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-muted/40">
-                      <TableHead>Thiết bị</TableHead>
-                      <TableHead>KTV</TableHead>
-                      <TableHead>Mẫu</TableHead>
-                      <TableHead>Bắt đầu</TableHead>
-                      <TableHead className="text-right">Thời lượng</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {equipmentUsageLogs.map((u) => (
-                      <TableRow key={u.id}>
-                        <TableCell>
-                          <div className="font-medium text-sm">
-                            {u.equipmentName}
-                          </div>
-                          <div className="text-xs text-muted-foreground font-mono">
-                            {u.equipmentCode}
-                          </div>
-                        </TableCell>
-                        <TableCell>{u.technician}</TableCell>
-                        <TableCell className="font-mono text-xs">
-                          {u.sampleCode}
-                        </TableCell>
-                        <TableCell className="text-muted-foreground text-xs">
-                          {u.startedAt}
-                        </TableCell>
-                        <TableCell className="text-right text-xs">
-                          {u.durationMin} phút
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              <div className="mt-4 p-3 rounded-md bg-blue-50 text-blue-700 text-xs flex items-start gap-2">
-                <ScrollText className="w-4 h-4 mt-0.5 shrink-0" />
-                Logbook là dữ liệu bắt buộc trong đánh giá nội bộ ISO/IEC 17025
-                – không cho phép sửa sau khi đóng phiên.
-              </div>
-            </CardContent>
-          </Card>
+        {/* 5. Nhật ký hiệu chuẩn thiết bị */}
+        <CrudTableCard
+          title="Nhật ký theo dõi hiệu chuẩn thiết bị"
+          description="Ngày hiệu chuẩn, kết quả, giấy chứng nhận, nơi thực hiện và hạn kế tiếp"
+          endpoint="/api/calibration-logs"
+          entity="calibration-logs"
+          editFields={CALIBRATION_FIELDS}
+          addNode={
+            <EntityFormDialog
+              mode="add"
+              endpoint="/api/calibration-logs"
+              title="Thêm nhật ký hiệu chuẩn"
+              addLabel="Thêm hiệu chuẩn"
+              fields={CALIBRATION_FIELDS}
+              submitLabel="Lưu"
+            />
+          }
+          headers={["Thiết bị", "Ngày", "Kết quả", "Giấy CN", "Nơi thực hiện", "Hạn kế tiếp"]}
+          rows={calibrationLogs.map((c) => ({
+            id: c.id,
+            label: c.equipmentName || c.equipmentCode,
+            initial: c,
+            cells: [
+              <div key="tb">
+                <div className="font-medium text-sm">{c.equipmentName}</div>
+                <div className="text-xs text-muted-foreground font-mono">
+                  {c.equipmentCode}
+                </div>
+              </div>,
+              <span key="ngay" className="text-muted-foreground text-sm">
+                {c.date}
+              </span>,
+              <Badge key="kq" variant={c.result === "Đạt" ? "success" : "destructive"}>
+                {c.result}
+              </Badge>,
+              <span key="cn" className="font-mono text-xs">
+                {c.certificate}
+              </span>,
+              c.place,
+              <span key="han" className="text-muted-foreground text-sm">
+                {c.nextDate}
+              </span>,
+            ],
+          }))}
+        />
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Giám sát môi trường phòng phân tích</CardTitle>
-              <CardDescription>
-                Nhiệt độ, độ ẩm – đối chiếu giới hạn quy định
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2.5">
-                {environmentReadings.map((r) => {
-                  const Icon =
-                    r.parameter === "Nhiệt độ" ? Thermometer : Droplets;
-                  return (
-                    <li
-                      key={r.id}
-                      className="flex items-center gap-3 p-3 rounded-md border bg-card"
-                    >
-                      <div
-                        className={`w-9 h-9 rounded-md flex items-center justify-center shrink-0 ${
-                          r.pass
-                            ? "bg-emerald-50 text-emerald-700"
-                            : "bg-rose-50 text-rose-600"
-                        }`}
-                      >
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate">
-                          {r.room} · {r.parameter}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          Giới hạn {r.limit} · {r.observer} · {r.recordedAt}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm font-semibold">
-                          {r.value}
-                          <span className="text-xs text-muted-foreground ml-0.5">
-                            {r.unit}
-                          </span>
-                        </div>
-                        <Badge variant={r.pass ? "success" : "destructive"}>
-                          {r.pass ? "Đạt" : "Không đạt"}
-                        </Badge>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            </CardContent>
-          </Card>
-        </section>
+        {/* 6. Nhật ký bảo trì, bảo dưỡng thiết bị */}
+        <CrudTableCard
+          title="Nhật ký theo dõi bảo trì, bảo dưỡng thiết bị"
+          description="Loại công việc, nội dung, đơn vị thực hiện"
+          endpoint="/api/maintenance-logs"
+          entity="maintenance-logs"
+          editFields={MAINTENANCE_FIELDS}
+          addNode={
+            <EntityFormDialog
+              mode="add"
+              endpoint="/api/maintenance-logs"
+              title="Thêm nhật ký bảo trì / bảo dưỡng"
+              addLabel="Thêm bảo trì"
+              fields={MAINTENANCE_FIELDS}
+              submitLabel="Lưu"
+            />
+          }
+          headers={["Thiết bị", "Ngày", "Loại", "Nội dung", "Đơn vị"]}
+          rows={maintenanceLogs.map((m) => ({
+            id: m.id,
+            label: m.equipmentName || m.equipmentCode,
+            initial: m,
+            cells: [
+              <div key="tb">
+                <div className="font-medium text-sm">{m.equipmentName}</div>
+                <div className="text-xs text-muted-foreground font-mono">
+                  {m.equipmentCode}
+                </div>
+              </div>,
+              <span key="ngay" className="text-muted-foreground text-sm">
+                {m.date}
+              </span>,
+              <Badge key="loai" variant="secondary" className="font-normal">
+                {m.kind}
+              </Badge>,
+              <span key="nd" className="text-sm">
+                {m.content}
+              </span>,
+              m.vendor,
+            ],
+          }))}
+        />
 
-        <Card>
-          <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between space-y-0">
-            <div>
-              <CardTitle>Biên bản kiểm định sau hiệu chuẩn</CardTitle>
-              <CardDescription>
-                Hồ sơ đánh giá thiết bị sau mỗi đợt hiệu chuẩn – phục vụ truy
-                xuất ISO/IEC 17025
-              </CardDescription>
-            </div>
-            <Button variant="outline" size="sm">
-              <History className="w-4 h-4" />
-              Xem toàn bộ
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-lg border">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/40">
-                    <TableHead>Mã thiết bị</TableHead>
-                    <TableHead>Tên thiết bị</TableHead>
-                    <TableHead>Ngày HC</TableHead>
-                    <TableHead>Đơn vị thực hiện</TableHead>
-                    <TableHead>Kết luận</TableHead>
-                    <TableHead>Hồ sơ</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {[
-                    {
-                      equipmentCode: "TB-pH-04",
-                      equipmentName: "Máy đo pH/EC để bàn",
-                      date: "2026-05-02",
-                      vendor: "ĐLVN – Tổng cục ĐLCL",
-                      verdict: "Đạt yêu cầu kỹ thuật đo lường",
-                      file: "BB-HC-2026-014.pdf",
-                    },
-                    {
-                      equipmentCode: "TB-AAS-01",
-                      equipmentName: "AAS Agilent 240FS",
-                      date: "2026-02-10",
-                      vendor: "Agilent VN",
-                      verdict: "Đạt – sai số ≤ ±2% chuẩn",
-                      file: "BB-HC-2026-007.pdf",
-                    },
-                    {
-                      equipmentCode: "TB-AUTO-01",
-                      equipmentName: "Máy chuẩn độ Metrohm",
-                      date: "2026-01-08",
-                      vendor: "Metrohm KV2",
-                      verdict: "Cần thay điện cực sau 6 tháng",
-                      file: "BB-HC-2026-002.pdf",
-                    },
-                  ].map((b) => (
-                    <TableRow key={b.equipmentCode + b.date}>
-                      <TableCell className="font-mono">
-                        {b.equipmentCode}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {b.equipmentName}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {b.date}
-                      </TableCell>
-                      <TableCell>{b.vendor}</TableCell>
-                      <TableCell className="text-xs">{b.verdict}</TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm" className="h-7">
-                          <ScrollText className="w-3.5 h-3.5" />
-                          {b.file}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+        {/* 3. Biên bản kiểm tra/kiểm định thiết bị */}
+        <CrudTableCard
+          title="Biên bản kiểm tra / kiểm định thiết bị"
+          description="Hồ sơ đánh giá thiết bị – phục vụ truy xuất ISO/IEC 17025"
+          endpoint="/api/inspection-records"
+          entity="inspection-records"
+          editFields={INSPECTION_FIELDS}
+          addNode={
+            <EntityFormDialog
+              mode="add"
+              endpoint="/api/inspection-records"
+              title="Thêm biên bản kiểm tra / kiểm định"
+              addLabel="Thêm biên bản"
+              fields={INSPECTION_FIELDS}
+              submitLabel="Lưu"
+            />
+          }
+          headers={["Thiết bị", "Ngày", "Loại", "Kết quả", "Kết luận", "Người/ĐV"]}
+          rows={inspectionRecords.map((r) => ({
+            id: r.id,
+            label: r.equipmentName || r.equipmentCode,
+            initial: r,
+            cells: [
+              <div key="tb">
+                <div className="font-medium text-sm">{r.equipmentName}</div>
+                <div className="text-xs text-muted-foreground font-mono">
+                  {r.equipmentCode}
+                </div>
+              </div>,
+              <span key="ngay" className="text-muted-foreground text-sm">
+                {r.date}
+              </span>,
+              <Badge key="loai" variant="outline">
+                {r.type}
+              </Badge>,
+              <Badge key="kq" variant={r.result === "Đạt" ? "success" : "destructive"}>
+                {r.result}
+              </Badge>,
+              <span key="kl" className="text-sm">
+                {r.conclusion}
+              </span>,
+              r.inspector,
+            ],
+          }))}
+        />
+
+        {/* 2. Hướng dẫn sử dụng thiết bị */}
+        <CrudTableCard
+          title="Hướng dẫn sử dụng thiết bị"
+          description="Tài liệu HDSD theo thiết bị – mã tài liệu, phiên bản, liên kết"
+          endpoint="/api/equipment-manuals"
+          entity="equipment-manuals"
+          editFields={MANUAL_FIELDS}
+          addNode={
+            <EntityFormDialog
+              mode="add"
+              endpoint="/api/equipment-manuals"
+              title="Thêm hướng dẫn sử dụng"
+              addLabel="Thêm tài liệu"
+              fields={MANUAL_FIELDS}
+              submitLabel="Lưu"
+            />
+          }
+          headers={["Thiết bị", "Tên tài liệu", "Mã TL", "Phiên bản", "Liên kết"]}
+          rows={manuals.map((m) => ({
+            id: m.id,
+            label: m.title,
+            initial: m,
+            cells: [
+              <div key="tb">
+                <div className="font-medium text-sm">{m.equipmentName}</div>
+                <div className="text-xs text-muted-foreground font-mono">
+                  {m.equipmentCode}
+                </div>
+              </div>,
+              <span key="tt" className="text-sm">
+                {m.title}
+              </span>,
+              <span key="ma" className="font-mono text-xs">
+                {m.docCode}
+              </span>,
+              m.version,
+              m.fileUrl ? (
+                <a
+                  key="lk"
+                  href={m.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-primary hover:underline text-sm"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  Mở
+                </a>
+              ) : (
+                <span key="lk" className="text-muted-foreground text-xs">
+                  —
+                </span>
+              ),
+            ],
+          }))}
+        />
       </main>
     </>
   );

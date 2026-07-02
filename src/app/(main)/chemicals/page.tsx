@@ -6,10 +6,6 @@ import {
   CalendarOff,
   Filter,
   ShieldAlert,
-  FileText,
-  FlaskRound,
-  Factory,
-  Snowflake,
 } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
@@ -30,12 +26,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { chemicalUsageLogs, type Chemical } from "@/lib/mock-data";
+import { type Chemical } from "@/lib/mock-data";
 import { chemicalsStore } from "@/lib/data/chemicals";
+import { chemicalProfileStore } from "@/lib/data/chemical-profiles";
+import { chemicalUsageLogStore } from "@/lib/data/chemical-usage-logs";
 import { AddChemicalDialog } from "@/components/chemicals/add-chemical-dialog";
 import { EditChemicalDialog } from "@/components/chemicals/edit-chemical-dialog";
 import { DeleteEntityButton } from "@/components/crud/delete-button";
 import { EntitySearchInput } from "@/components/crud/search-input";
+import {
+  EntityFormDialog,
+  type CrudField,
+} from "@/components/crud/entity-form-dialog";
+import { CrudTableCard } from "@/components/crud/crud-table-card";
 
 export const dynamic = "force-dynamic";
 
@@ -56,6 +59,36 @@ function daysUntil(dateStr: string) {
   return Math.round(diff);
 }
 
+const PROFILE_FIELDS: CrudField[] = [
+  { name: "chemicalCode", label: "Mã hóa chất", required: true, mono: true },
+  { name: "chemicalName", label: "Tên hóa chất / chất chuẩn" },
+  {
+    name: "docType",
+    label: "Loại hồ sơ",
+    type: "select",
+    options: ["CoA", "MSDS", "Chứng nhận", "Khác"],
+  },
+  { name: "docCode", label: "Mã hồ sơ", mono: true },
+  { name: "issuedBy", label: "Đơn vị cấp" },
+  { name: "issueDate", label: "Ngày cấp", type: "date" },
+  { name: "fileUrl", label: "Link tài liệu", full: true },
+  { name: "note", label: "Ghi chú", full: true },
+];
+
+const CHEM_USAGE_FIELDS: CrudField[] = [
+  { name: "chemicalCode", label: "Mã hóa chất", required: true, mono: true },
+  { name: "chemicalName", label: "Tên hóa chất / chất chuẩn" },
+  { name: "category", label: "Chủng loại" },
+  { name: "unit", label: "Đơn vị tính" },
+  { name: "qty", label: "Số lượng", type: "number" },
+  { name: "usedAt", label: "Ngày xuất", type: "date" },
+  { name: "remaining", label: "Khối lượng dư", type: "number" },
+  { name: "purpose", label: "Mục đích sử dụng", full: true },
+  { name: "technician", label: "Người sử dụng" },
+  { name: "sampleCode", label: "Mẫu", mono: true },
+  { name: "method", label: "Phép thử" },
+];
+
 export default async function ChemicalsPage({
   searchParams,
 }: {
@@ -73,6 +106,11 @@ export default async function ChemicalsPage({
           c.location.toLowerCase().includes(query),
       )
     : all;
+
+  const [chemicalProfiles, chemicalUsageLogs] = await Promise.all([
+    chemicalProfileStore.list(),
+    chemicalUsageLogStore.list(),
+  ]);
 
   const stats = [
     {
@@ -106,8 +144,8 @@ export default async function ChemicalsPage({
   return (
     <>
       <Header
-        title="Quản lý hóa chất – vật tư"
-        description="Theo dõi nhập – xuất kho, hạn sử dụng, tồn kho và cảnh báo an toàn"
+        title="Quản lý hóa chất, chất chuẩn"
+        description="Danh mục, hồ sơ (CoA/MSDS), nhật ký sử dụng, hạn dùng và cảnh báo an toàn"
       />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 scrollbar-thin">
         <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -133,7 +171,7 @@ export default async function ChemicalsPage({
         <Card>
           <CardHeader className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between space-y-0">
             <div>
-              <CardTitle>Danh mục hóa chất – vật tư</CardTitle>
+              <CardTitle>Danh mục hóa chất, chất chuẩn</CardTitle>
               <CardDescription>
                 Tồn kho hiện tại, mức tối thiểu, hạn sử dụng và mức cảnh báo
               </CardDescription>
@@ -371,142 +409,112 @@ export default async function ChemicalsPage({
           </Card>
         </section>
 
-        <Card>
-          <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between space-y-0">
-            <div>
-              <CardTitle>Hồ sơ hóa chất – chất chuẩn</CardTitle>
-              <CardDescription>
-                Đặc tính kỹ thuật, NSX, điều kiện bảo quản, phép thử sử dụng –
-                phục vụ truy xuất ISO/IEC 17025
-              </CardDescription>
-            </div>
-            <Button variant="outline" size="sm">
-              <FileText />
-              Xuất hồ sơ PDF
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              {chemicals.slice(0, 4).map((c) => (
-                <div
-                  key={c.id}
-                  className="p-4 rounded-lg border bg-card space-y-3"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <FlaskRound className="w-4 h-4 text-primary shrink-0" />
-                        <span className="font-medium text-sm">{c.name}</span>
-                        {c.isReference && (
-                          <Badge variant="default">Chất chuẩn</Badge>
-                        )}
-                      </div>
-                      <div className="text-xs text-muted-foreground font-mono mt-0.5">
-                        {c.code} · CAS {c.cas}
-                      </div>
-                    </div>
-                    <Badge variant={hazardVariant[c.hazard]}>{c.hazard}</Badge>
-                  </div>
-                  <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
-                    <div>
-                      <div className="text-muted-foreground">Đặc tính KT</div>
-                      <div className="font-medium">{c.technicalSpec}</div>
-                    </div>
-                    <div>
-                      <div className="text-muted-foreground flex items-center gap-1">
-                        <Factory className="w-3 h-3" />
-                        Nhà sản xuất
-                      </div>
-                      <div className="font-medium">{c.manufacturer}</div>
-                    </div>
-                    <div>
-                      <div className="text-muted-foreground">Ngày sản xuất</div>
-                      <div className="font-medium">{c.manufactureDate}</div>
-                    </div>
-                    <div>
-                      <div className="text-muted-foreground">Ngày nhận</div>
-                      <div className="font-medium">{c.receivedAt}</div>
-                    </div>
-                    <div className="col-span-2">
-                      <div className="text-muted-foreground flex items-center gap-1">
-                        <Snowflake className="w-3 h-3" />
-                        Điều kiện bảo quản
-                      </div>
-                      <div className="font-medium">{c.storageCondition}</div>
-                    </div>
-                    <div className="col-span-2">
-                      <div className="text-muted-foreground">
-                        Dùng cho phép thử
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-1">
-                        {c.usedFor.map((u) => (
-                          <Badge
-                            key={u}
-                            variant="secondary"
-                            className="text-[11px]"
-                          >
-                            {u}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+        {/* Hồ sơ hóa chất, chất chuẩn */}
+        <CrudTableCard
+          title="Hồ sơ hóa chất, chất chuẩn"
+          description="CoA / MSDS / chứng nhận – phục vụ truy xuất ISO/IEC 17025"
+          endpoint="/api/chemical-profiles"
+          entity="chemical-profiles"
+          editFields={PROFILE_FIELDS}
+          addNode={
+            <EntityFormDialog
+              mode="add"
+              endpoint="/api/chemical-profiles"
+              title="Thêm hồ sơ hóa chất"
+              addLabel="Thêm hồ sơ"
+              fields={PROFILE_FIELDS}
+              submitLabel="Lưu"
+            />
+          }
+          headers={["Hóa chất", "Loại", "Mã hồ sơ", "Đơn vị cấp", "Ngày cấp", "Liên kết"]}
+          rows={chemicalProfiles.map((p) => ({
+            id: p.id,
+            label: p.chemicalName || p.chemicalCode,
+            initial: p,
+            cells: [
+              <div key="hc">
+                <div className="font-medium text-sm">{p.chemicalName}</div>
+                <div className="text-xs text-muted-foreground font-mono">
+                  {p.chemicalCode}
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+              </div>,
+              <Badge key="loai" variant="outline">
+                {p.docType}
+              </Badge>,
+              <span key="ma" className="font-mono text-xs">
+                {p.docCode}
+              </span>,
+              p.issuedBy,
+              <span key="ngay" className="text-muted-foreground text-sm">
+                {p.issueDate}
+              </span>,
+              p.fileUrl ? (
+                <a
+                  key="lk"
+                  href={p.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline text-sm"
+                >
+                  Mở
+                </a>
+              ) : (
+                <span key="lk" className="text-muted-foreground text-xs">
+                  —
+                </span>
+              ),
+            ],
+          }))}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Nhật ký sử dụng hóa chất – chất chuẩn</CardTitle>
-            <CardDescription>
-              Ghi nhận lượng dùng theo từng mẫu / phép thử – đối chiếu kho và
-              QA/QC
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-lg border">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/40">
-                    <TableHead>Thời điểm</TableHead>
-                    <TableHead>Hóa chất / chất chuẩn</TableHead>
-                    <TableHead>Lượng dùng</TableHead>
-                    <TableHead>Mẫu</TableHead>
-                    <TableHead>Phép thử</TableHead>
-                    <TableHead>KTV</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {chemicalUsageLogs.map((u) => (
-                    <TableRow key={u.id}>
-                      <TableCell className="text-muted-foreground text-xs">
-                        {u.usedAt}
-                      </TableCell>
-                      <TableCell>
-                        <div className="font-medium text-sm">
-                          {u.chemicalName}
-                        </div>
-                        <div className="text-xs text-muted-foreground font-mono">
-                          {u.chemicalCode}
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {u.qty} {u.unit}
-                      </TableCell>
-                      <TableCell className="font-mono text-xs">
-                        {u.sampleCode}
-                      </TableCell>
-                      <TableCell className="text-xs">{u.method}</TableCell>
-                      <TableCell>{u.technician}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Nhật ký sử dụng hóa chất, chất chuẩn */}
+        <CrudTableCard
+          title="Nhật ký sử dụng hóa chất, chất chuẩn"
+          description="Chủng loại, số lượng xuất, khối lượng dư, mục đích và người sử dụng"
+          endpoint="/api/chemical-usage-logs"
+          entity="chemical-usage-logs"
+          editFields={CHEM_USAGE_FIELDS}
+          addNode={
+            <EntityFormDialog
+              mode="add"
+              endpoint="/api/chemical-usage-logs"
+              title="Thêm nhật ký sử dụng"
+              addLabel="Thêm nhật ký"
+              fields={CHEM_USAGE_FIELDS}
+              submitLabel="Lưu"
+            />
+          }
+          headers={["Hóa chất", "Chủng loại", "Số lượng", "Ngày xuất", "Dư", "Mục đích", "Người dùng"]}
+          rows={chemicalUsageLogs.map((u) => ({
+            id: u.id,
+            label: u.chemicalName || u.chemicalCode,
+            initial: u,
+            cells: [
+              <div key="hc">
+                <div className="font-medium text-sm">{u.chemicalName}</div>
+                <div className="text-xs text-muted-foreground font-mono">
+                  {u.chemicalCode}
+                </div>
+              </div>,
+              <span key="cl" className="text-sm">
+                {u.category || "—"}
+              </span>,
+              <span key="sl" className="text-sm">
+                {u.qty} {u.unit}
+              </span>,
+              <span key="nx" className="text-muted-foreground text-xs">
+                {u.usedAt}
+              </span>,
+              <span key="du" className="text-sm">
+                {u.remaining ? `${u.remaining} ${u.unit}` : "—"}
+              </span>,
+              <span key="md" className="text-sm">
+                {u.purpose || u.method || "—"}
+              </span>,
+              u.technician,
+            ],
+          }))}
+        />
       </main>
     </>
   );

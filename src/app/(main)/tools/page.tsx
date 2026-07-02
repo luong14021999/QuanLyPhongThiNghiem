@@ -8,10 +8,37 @@ import {
   ClipboardCheck,
 } from "lucide-react";
 import { toolsStore } from "@/lib/data/tools";
+import { supplyStore } from "@/lib/data/supplies";
+import { toolUsageLogStore } from "@/lib/data/tool-usage-logs";
 import { AddToolDialog } from "@/components/tools/add-tool-dialog";
 import { EditToolDialog } from "@/components/tools/edit-tool-dialog";
 import { DeleteEntityButton } from "@/components/crud/delete-button";
 import { EntitySearchInput } from "@/components/crud/search-input";
+import {
+  EntityFormDialog,
+  type CrudField,
+} from "@/components/crud/entity-form-dialog";
+import { CrudTableCard } from "@/components/crud/crud-table-card";
+
+const SUPPLY_FIELDS: CrudField[] = [
+  { name: "code", label: "Mã vật tư", required: true, mono: true },
+  { name: "name", label: "Tên vật tư", required: true, full: true },
+  { name: "unit", label: "Đơn vị tính" },
+  { name: "qty", label: "Số lượng tồn", type: "number" },
+  { name: "minQty", label: "Tồn tối thiểu", type: "number" },
+  { name: "location", label: "Vị trí" },
+  { name: "note", label: "Ghi chú", full: true },
+];
+
+const TOOL_USAGE_FIELDS: CrudField[] = [
+  { name: "itemName", label: "Tên dụng cụ / vật tư", required: true, full: true },
+  { name: "qty", label: "Số lượng", type: "number" },
+  { name: "unit", label: "Đơn vị tính" },
+  { name: "importedAt", label: "Ngày nhập", type: "date" },
+  { name: "status", label: "Tình trạng sử dụng" },
+  { name: "user", label: "Người sử dụng" },
+  { name: "note", label: "Ghi chú", full: true },
+];
 
 export const dynamic = "force-dynamic";
 import { Header } from "@/components/layout/header";
@@ -73,6 +100,11 @@ export default async function ToolsPage({
 
   const categories = Array.from(new Set(all.map((t) => t.category)));
 
+  const [supplies, toolUsageLogs] = await Promise.all([
+    supplyStore.list(),
+    toolUsageLogStore.list(),
+  ]);
+
   const stats = [
     {
       label: "Đầu mục dụng cụ",
@@ -111,8 +143,8 @@ export default async function ToolsPage({
   return (
     <>
       <Header
-        title="Quản lý dụng cụ"
-        description="Dụng cụ thể tích, thủy tinh, vật tư tiêu hao – kèm lịch kiểm định và tồn kho"
+        title="Quản lý dụng cụ – vật tư"
+        description="Dụng cụ thể tích/thủy tinh, danh mục vật tư, nhật ký sử dụng và lịch kiểm định"
       />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 scrollbar-thin">
         <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -140,7 +172,7 @@ export default async function ToolsPage({
             <div>
               <CardTitle>Danh mục dụng cụ</CardTitle>
               <CardDescription>
-                Bao gồm dụng cụ thể tích (có kiểm định) và vật tư tiêu hao
+                Bao gồm dụng cụ thể tích (có kiểm định) và vật tư
               </CardDescription>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -347,6 +379,92 @@ export default async function ToolsPage({
             </CardContent>
           </Card>
         </section>
+
+        {/* Danh mục vật tư */}
+        <CrudTableCard
+          title="Danh mục vật tư"
+          description="Vật tư dùng chung phòng thí nghiệm – tồn kho & vị trí"
+          endpoint="/api/supplies"
+          entity="supplies"
+          editFields={SUPPLY_FIELDS}
+          addNode={
+            <EntityFormDialog
+              mode="add"
+              endpoint="/api/supplies"
+              title="Thêm vật tư"
+              addLabel="Thêm vật tư"
+              fields={SUPPLY_FIELDS}
+              submitLabel="Lưu"
+            />
+          }
+          headers={["Vật tư", "ĐVT", "Tồn", "Tối thiểu", "Vị trí"]}
+          rows={supplies.map((s) => ({
+            id: s.id,
+            label: s.name,
+            initial: s,
+            cells: [
+              <div key="vt">
+                <div className="font-medium text-sm">{s.name}</div>
+                <div className="text-xs text-muted-foreground font-mono">
+                  {s.code}
+                </div>
+              </div>,
+              s.unit,
+              <span
+                key="ton"
+                className={
+                  s.qty < s.minQty ? "text-rose-600 font-medium" : "font-medium"
+                }
+              >
+                {s.qty}
+              </span>,
+              <span key="min" className="text-muted-foreground text-sm">
+                {s.minQty}
+              </span>,
+              s.location,
+            ],
+          }))}
+        />
+
+        {/* Nhật ký theo dõi sử dụng dụng cụ, vật tư */}
+        <CrudTableCard
+          title="Nhật ký theo dõi sử dụng dụng cụ, vật tư tiêu hao"
+          description="Tên dụng cụ/vật tư, số lượng, ngày nhập và tình trạng sử dụng"
+          endpoint="/api/tool-usage-logs"
+          entity="tool-usage-logs"
+          editFields={TOOL_USAGE_FIELDS}
+          addNode={
+            <EntityFormDialog
+              mode="add"
+              endpoint="/api/tool-usage-logs"
+              title="Thêm nhật ký sử dụng"
+              addLabel="Thêm nhật ký"
+              fields={TOOL_USAGE_FIELDS}
+              submitLabel="Lưu"
+            />
+          }
+          headers={["Tên dụng cụ / vật tư", "Số lượng", "Ngày nhập", "Tình trạng", "Người dùng"]}
+          rows={toolUsageLogs.map((u) => ({
+            id: u.id,
+            label: u.itemName,
+            initial: u,
+            cells: [
+              <span key="ten" className="font-medium text-sm">
+                {u.itemName}
+              </span>,
+              <span key="sl" className="text-sm">
+                {u.qty} {u.unit}
+              </span>,
+              <span key="nn" className="text-muted-foreground text-sm">
+                {u.importedAt}
+              </span>,
+              <span key="tt" className="text-sm">
+                {u.status}
+              </span>,
+              u.user,
+            ],
+          }))}
+        />
       </main>
     </>
   );

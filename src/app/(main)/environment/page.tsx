@@ -29,6 +29,28 @@ import {
 import { environmentStore } from "@/lib/data/environment";
 import { AddEnvironmentReadingDialog } from "@/components/environment/add-reading-dialog";
 import { DeleteEntityButton } from "@/components/crud/delete-button";
+import {
+  EntityFormDialog,
+  type CrudField,
+} from "@/components/crud/entity-form-dialog";
+
+const ENV_FIELDS: CrudField[] = [
+  { name: "room", label: "Phòng", required: true },
+  {
+    name: "parameter",
+    label: "Thông số",
+    type: "select",
+    options: ["Nhiệt độ", "Độ ẩm"],
+  },
+  { name: "monitoringDevice", label: "Thiết bị kiểm soát", full: true },
+  { name: "value", label: "Giá trị đo", type: "number" },
+  { name: "unit", label: "ĐVT" },
+  { name: "limit", label: "Giới hạn" },
+  { name: "recordedAt", label: "Thời điểm", type: "datetime-local" },
+  { name: "observer", label: "Người theo dõi" },
+  { name: "pass", label: "Nhận xét", type: "bool" },
+  { name: "note", label: "Ghi chú", full: true },
+];
 
 export const dynamic = "force-dynamic";
 
@@ -375,11 +397,22 @@ export default async function EnvironmentPage({
                           </TableCell>
                           <TableCell>
                             {r && (
-                              <DeleteEntityButton
-                                entity="environment"
-                                id={r.id}
-                                label={`ngày ${day}`}
-                              />
+                              <div className="flex items-center justify-end gap-1.5">
+                                <EntityFormDialog
+                                  mode="edit"
+                                  endpoint="/api/environment"
+                                  id={r.id}
+                                  title="Sửa lần đo môi trường"
+                                  fields={ENV_FIELDS}
+                                  initial={r}
+                                  submitLabel="Lưu thay đổi"
+                                />
+                                <DeleteEntityButton
+                                  entity="environment"
+                                  id={r.id}
+                                  label={`ngày ${day}`}
+                                />
+                              </div>
                             )}
                           </TableCell>
                         </TableRow>
@@ -452,11 +485,22 @@ export default async function EnvironmentPage({
                         </TableCell>
                         <TableCell className="text-xs">{r.observer}</TableCell>
                         <TableCell>
-                          <DeleteEntityButton
-                            entity="environment"
-                            id={r.id}
-                            label={`${r.room} · ${r.recordedAt}`}
-                          />
+                          <div className="flex items-center justify-end gap-1.5">
+                            <EntityFormDialog
+                              mode="edit"
+                              endpoint="/api/environment"
+                              id={r.id}
+                              title="Sửa lần đo môi trường"
+                              fields={ENV_FIELDS}
+                              initial={r}
+                              submitLabel="Lưu thay đổi"
+                            />
+                            <DeleteEntityButton
+                              entity="environment"
+                              id={r.id}
+                              label={`${r.room} · ${r.recordedAt}`}
+                            />
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}

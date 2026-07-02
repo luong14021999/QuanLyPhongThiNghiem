@@ -1,7 +1,10 @@
 import { promises as fs } from "fs";
 import path from "path";
 
-const DATA_DIR = path.join(process.cwd(), "data");
+// Trên Vercel, cwd read-only → ghi vào /tmp (ephemeral). Local dùng ./data (persist).
+const DATA_DIR = process.env.VERCEL
+  ? path.join("/tmp", "data")
+  : path.join(process.cwd(), "data");
 
 async function ensureDir() {
   await fs.mkdir(DATA_DIR, { recursive: true });
