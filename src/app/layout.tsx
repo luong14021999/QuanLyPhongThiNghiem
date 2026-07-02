@@ -1,16 +1,22 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toast";
 
 const inter = Inter({ subsets: ["latin", "vietnamese"] });
 
+export const viewport: Viewport = {
+  themeColor: "#1d8048",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export const metadata: Metadata = {
   title: "Viện Nông Nghiệp Thanh Hóa – Quản lý PTN",
   description:
     "Hệ thống quản lý phòng thí nghiệm phân tích môi trường – đất – nước – phân bón – an toàn thực phẩm, vận hành theo ISO/IEC 17025",
   manifest: "/manifest.json",
-  themeColor: "#1d8048",
   icons: {
     icon: "/logo-vnnth.png",
     apple: "/logo-vnnth.png",
