@@ -205,7 +205,7 @@ export default async function CustomersPage({
                     <TableHead>Địa chỉ</TableHead>
                     <TableHead className="text-right">Mẫu YTD</TableHead>
                     <TableHead>Mẫu gần nhất</TableHead>
-                    <TableHead className="w-[60px]"></TableHead>
+                    <TableHead className="w-[110px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

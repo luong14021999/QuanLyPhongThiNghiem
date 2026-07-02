@@ -171,7 +171,7 @@ export default async function ChemicalsPage({
                     <TableHead>Hạn dùng</TableHead>
                     <TableHead>Vị trí</TableHead>
                     <TableHead>Phân loại</TableHead>
-                    <TableHead className="w-[60px]"></TableHead>
+                    <TableHead className="w-[160px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -246,7 +246,7 @@ export default async function ChemicalsPage({
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-0.5">
+                          <div className="flex items-center gap-1.5">
                             <EditChemicalDialog row={c} />
                             <DeleteEntityButton
                               entity="chemicals"

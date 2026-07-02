@@ -326,7 +326,7 @@ export default async function EnvironmentPage({
                       </TableHead>
                       <TableHead>Người theo dõi</TableHead>
                       <TableHead>Ghi chú</TableHead>
-                      <TableHead className="w-[60px]"></TableHead>
+                      <TableHead className="w-[110px]"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -422,7 +422,7 @@ export default async function EnvironmentPage({
                     <TableHead>Giới hạn</TableHead>
                     <TableHead>Nhận xét</TableHead>
                     <TableHead>Người theo dõi</TableHead>
-                    <TableHead className="w-[60px]"></TableHead>
+                    <TableHead className="w-[110px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

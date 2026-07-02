@@ -133,8 +133,8 @@ export default async function EquipmentPage({
           ))}
         </section>
 
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <Card className="lg:col-span-2">
+        <section>
+          <Card>
             <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between space-y-0">
               <div>
                 <CardTitle>Danh mục thiết bị</CardTitle>
@@ -167,7 +167,7 @@ export default async function EquipmentPage({
                       <TableHead>HC kế tiếp</TableHead>
                       <TableHead>Giờ chạy</TableHead>
                       <TableHead>Trạng thái</TableHead>
-                      <TableHead className="w-[60px]"></TableHead>
+                      <TableHead className="w-[160px]"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -229,7 +229,7 @@ export default async function EquipmentPage({
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <div className="flex items-center gap-0.5">
+                            <div className="flex items-center gap-1.5">
                               <EditEquipmentDialog row={e} />
                               <DeleteEntityButton
                                 entity="equipment"
@@ -246,7 +246,9 @@ export default async function EquipmentPage({
               </div>
             </CardContent>
           </Card>
+        </section>
 
+        <section>
           <Card>
             <CardHeader>
               <CardTitle>Lịch hiệu chuẩn / bảo trì</CardTitle>

@@ -246,7 +246,7 @@ export default async function TestRequestsPage({
                     <TableHead className="text-right">Giá trị (VND)</TableHead>
                     <TableHead>Hạn KH</TableHead>
                     <TableHead>Trạng thái</TableHead>
-                    <TableHead className="w-[60px]"></TableHead>
+                    <TableHead className="w-[110px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

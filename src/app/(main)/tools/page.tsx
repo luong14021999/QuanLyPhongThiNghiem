@@ -173,7 +173,7 @@ export default async function ToolsPage({
                     <TableHead>Vị trí</TableHead>
                     <TableHead>Kiểm định</TableHead>
                     <TableHead>Trạng thái</TableHead>
-                    <TableHead className="w-[60px]"></TableHead>
+                    <TableHead className="w-[160px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -247,7 +247,7 @@ export default async function ToolsPage({
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-0.5">
+                          <div className="flex items-center gap-1.5">
                             <EditToolDialog row={t} />
                             <DeleteEntityButton
                               entity="tools"

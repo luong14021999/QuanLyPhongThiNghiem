@@ -228,7 +228,7 @@ export default async function SamplesPage({
                     <TableHead>Phụ trách</TableHead>
                     <TableHead>Tiến độ</TableHead>
                     <TableHead>Trạng thái</TableHead>
-                    <TableHead className="w-[60px]"></TableHead>
+                    <TableHead className="w-[110px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

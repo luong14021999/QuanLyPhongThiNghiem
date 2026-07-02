@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Pencil, X, Loader2 } from "lucide-react";
+import { toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,9 +42,12 @@ export function EditEquipmentDialog({ row }: { row: Equipment }) {
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      setError(body.error ?? `HTTP ${res.status}`);
+      const message = body.error ?? `HTTP ${res.status}`;
+      setError(message);
+      toast.error("Cập nhật thất bại", message);
       return;
     }
+    toast.success("Cập nhật thành công", `Đã lưu "${row.name}"`);
     startTransition(() => {
       router.refresh();
       setOpen(false);
@@ -54,12 +58,13 @@ export function EditEquipmentDialog({ row }: { row: Equipment }) {
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
-          className="h-7 px-2 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+          className="h-8 gap-1.5 text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700"
           aria-label={`Sửa ${row.name}`}
         >
           <Pencil className="w-3.5 h-3.5" />
+          Sửa
         </Button>
       </Dialog.Trigger>
       <Dialog.Portal>

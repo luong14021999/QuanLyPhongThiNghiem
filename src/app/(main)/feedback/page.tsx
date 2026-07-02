@@ -265,7 +265,7 @@ export default async function FeedbackPage({
                     <TableHead>Hạn KQ</TableHead>
                     <TableHead>Ngày</TableHead>
                     <TableHead>Khiếu nại</TableHead>
-                    <TableHead className="w-[60px]"></TableHead>
+                    <TableHead className="w-[110px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

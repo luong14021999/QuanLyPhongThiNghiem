@@ -193,7 +193,7 @@ export default async function ArchivePage({
                     <TableHead>Hạn lưu</TableHead>
                     <TableHead>Lượng còn</TableHead>
                     <TableHead>Trạng thái</TableHead>
-                    <TableHead className="w-[60px]"></TableHead>
+                    <TableHead className="w-[110px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

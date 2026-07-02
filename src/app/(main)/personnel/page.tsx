@@ -1,7 +1,6 @@
 import {
   Users,
   UserPlus,
-  Filter,
   GraduationCap,
   Mail,
   Phone,
@@ -15,7 +14,6 @@ import { EntitySearchInput } from "@/components/crud/search-input";
 
 export const dynamic = "force-dynamic";
 import { Header } from "@/components/layout/header";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -32,13 +30,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { staff } from "@/lib/mock-data";
 
 const statusVariant = {
   "Đang làm việc": "success",
   "Nghỉ phép": "warning",
   "Thử việc": "secondary",
 } as const;
+
+function initials(name: string) {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(-2)
+    .map((w) => w[0] ?? "")
+    .join("")
+    .toUpperCase();
+}
 
 export default async function PersonnelPage({
   searchParams,
@@ -87,16 +94,6 @@ export default async function PersonnelPage({
     },
   ];
 
-  const trainingFeed = all
-    .flatMap((s) =>
-      s.trainings.map((t) => ({
-        name: s.fullName,
-        course: t.name,
-        year: t.year,
-      })),
-    )
-    .sort((a, b) => b.year - a.year)
-    .slice(0, 6);
 
   return (
     <>
@@ -125,8 +122,8 @@ export default async function PersonnelPage({
           ))}
         </section>
 
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <Card className="lg:col-span-2">
+        <section>
+          <Card>
             <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between space-y-0">
               <div>
                 <CardTitle>Danh sách nhân sự</CardTitle>
@@ -140,34 +137,41 @@ export default async function PersonnelPage({
                   basePath="/personnel"
                   placeholder="Tìm tên, mã, nhóm..."
                 />
-                <Button variant="outline" size="sm">
-                  <Filter />
-                  Lọc
-                </Button>
                 <AddStaffDialog />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="rounded-lg border">
+              <div className="rounded-xl border overflow-hidden">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-muted/40">
-                      <TableHead>Mã</TableHead>
-                      <TableHead>Họ tên</TableHead>
-                      <TableHead>Chức danh</TableHead>
-                      <TableHead>Nhóm chuyên môn</TableHead>
-                      <TableHead>Liên hệ</TableHead>
-                      <TableHead>Vào làm</TableHead>
-                      <TableHead>Trạng thái</TableHead>
-                      <TableHead className="w-[60px]"></TableHead>
+                    <TableRow className="bg-muted/50 hover:bg-muted/50 border-0">
+                      <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Nhân sự
+                      </TableHead>
+                      <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Chức danh
+                      </TableHead>
+                      <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Nhóm chuyên môn
+                      </TableHead>
+                      <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Liên hệ
+                      </TableHead>
+                      <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Vào làm
+                      </TableHead>
+                      <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Trạng thái
+                      </TableHead>
+                      <TableHead className="w-[160px]"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {staff.length === 0 && (
                       <TableRow>
                         <TableCell
-                          colSpan={8}
-                          className="text-center text-sm text-muted-foreground py-8"
+                          colSpan={7}
+                          className="text-center text-sm text-muted-foreground py-10"
                         >
                           {query
                             ? `Không có nhân sự nào khớp "${query}"`
@@ -176,28 +180,44 @@ export default async function PersonnelPage({
                       </TableRow>
                     )}
                     {staff.map((s) => (
-                      <TableRow key={s.id}>
-                        <TableCell className="font-mono">{s.code}</TableCell>
-                        <TableCell className="font-medium">
-                          {s.fullName}
+                      <TableRow
+                        key={s.id}
+                        className="hover:bg-primary/[0.04] transition-colors"
+                      >
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold shrink-0">
+                              {initials(s.fullName)}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="font-medium truncate">
+                                {s.fullName}
+                              </div>
+                              <div className="text-xs text-muted-foreground font-mono">
+                                {s.code}
+                              </div>
+                            </div>
+                          </div>
                         </TableCell>
                         <TableCell>{s.position}</TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {s.department}
+                        <TableCell>
+                          <Badge variant="secondary" className="font-normal">
+                            {s.department}
+                          </Badge>
                         </TableCell>
                         <TableCell>
                           <div className="text-xs space-y-0.5">
                             <div className="flex items-center gap-1.5 text-muted-foreground">
-                              <Mail className="w-3 h-3" />
+                              <Mail className="w-3 h-3 shrink-0" />
                               {s.email}
                             </div>
                             <div className="flex items-center gap-1.5 text-muted-foreground">
-                              <Phone className="w-3 h-3" />
+                              <Phone className="w-3 h-3 shrink-0" />
                               {s.phone}
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="text-muted-foreground">
+                        <TableCell className="text-muted-foreground whitespace-nowrap">
                           {s.joinedAt}
                         </TableCell>
                         <TableCell>
@@ -206,7 +226,7 @@ export default async function PersonnelPage({
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-0.5">
+                          <div className="flex items-center justify-end gap-1.5">
                             <EditStaffDialog row={s} />
                             <DeleteEntityButton
                               entity="staff"
@@ -220,104 +240,6 @@ export default async function PersonnelPage({
                   </TableBody>
                 </Table>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Sơ đồ tổ chức PTN</CardTitle>
-              <CardDescription>
-                Tỷ trọng nhân sự theo nhóm chuyên môn
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {departments.map((d) => {
-                const count = staff.filter((s) => s.department === d).length;
-                const pct = Math.round((count / staff.length) * 100);
-                return (
-                  <div key={d}>
-                    <div className="flex items-center justify-between text-sm mb-1.5">
-                      <span className="truncate pr-2">{d}</span>
-                      <span className="text-muted-foreground text-xs">
-                        {count} người · {pct}%
-                      </span>
-                    </div>
-                    <div className="h-2 rounded-full bg-muted overflow-hidden">
-                      <div
-                        className="h-full bg-primary"
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </CardContent>
-          </Card>
-        </section>
-
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Phiếu theo dõi năng lực</CardTitle>
-              <CardDescription>
-                Năng lực chuyên môn và ủy quyền phương pháp phân tích
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                {staff.slice(0, 5).map((s) => (
-                  <li
-                    key={s.id}
-                    className="p-3 rounded-md border bg-card space-y-2"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm font-medium">{s.fullName}</div>
-                      <span className="text-xs text-muted-foreground">
-                        {s.position}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {s.competencies.map((c) => (
-                        <Badge key={c} variant="secondary" className="text-xs">
-                          {c}
-                        </Badge>
-                      ))}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Đào tạo & duy trì năng lực</CardTitle>
-              <CardDescription>
-                Khoá đào tạo gần nhất – phục vụ hồ sơ ISO/IEC 17025
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                {trainingFeed.map((t, i) => (
-                  <li
-                    key={i}
-                    className="flex items-center gap-3 p-3 rounded-md border bg-card"
-                  >
-                    <div className="w-9 h-9 rounded-md bg-primary/10 text-primary flex items-center justify-center">
-                      <GraduationCap className="w-4 h-4" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium truncate">
-                        {t.course}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {t.name}
-                      </div>
-                    </div>
-                    <Badge variant="outline">{t.year}</Badge>
-                  </li>
-                ))}
-              </ul>
             </CardContent>
           </Card>
         </section>
